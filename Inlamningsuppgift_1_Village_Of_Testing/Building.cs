@@ -10,7 +10,13 @@ public class Building
     private int _daysToBuild;
     private int _daysWorkedOn;
     private bool _isBuilt;
-    private string _name;
+    private Type _type;
+    
+    public Type BuildingType
+    {
+        get => _type;
+        set => _type = value;
+    }
     public enum Type {
         House = 1,
         Woodmill = 2,
@@ -38,6 +44,7 @@ public class Building
     {
         _buildingTypeCosts.TryGetValue(type, out var typeCost);
         (_costWood, _costMetal, _daysToComplete) = typeCost!(this);
+        BuildingType = type;
     }
 
     public int GetCostWood()

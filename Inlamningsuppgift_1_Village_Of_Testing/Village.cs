@@ -1,5 +1,6 @@
-namespace Inlamningsuppgift_1_Village_Of_Testing;
+using static Inlamningsuppgift_1_Village_Of_Testing.Strings.Message;
 
+namespace Inlamningsuppgift_1_Village_Of_Testing;
 public class Village
 {
     private List<Building> _buildings = new List<Building>();
@@ -12,82 +13,174 @@ public class Village
     private int _wood = 0;
     private int _woodPerDay = 0;
     private List<Worker> _workers = new List<Worker>();
-    public Village()
+    private bool _gameOver = false;
+    private int _maxWorkers = 0;
+
+    private readonly IUI _ui;
+    
+    private readonly Strings _strings = new Strings();
+    
+    public bool GameOver => _gameOver;
+
+    public Village(IUI ui)
     {
+        // Initialize the UI
+        _ui = ui;
+
         // Create three houses.
         for (int i = 0; i < 3; i++)
         {
-            _buildings.Add((new Building(Building.Type.House)));
+            //_buildings.Add((new Building(Building.Type.House)));
+            Build(Building.Type.House);
         }
     }
-
-    public void AddFood()
+    
+    public void Day()
     {
+        do
+        {
+            foreach(var worker in _workers)
+            {
+                // Make the workers do the day's work. Only if they're not hungry, though.
+                if (!worker.Hungry && worker.Alive)
+                {
+                    worker.DoWork();
+                }
+            
+                // Make the workers eat the amount each day.
+                FeedWorkers(1);
+            }
+            // If we get Game Over after the day's events, the game ends.
+        } while (!_gameOver);
+    }
+
+    public void AddFood(int amount)
+    {
+        _food += amount;
+    }
+    public void AddMetal(int amount)
+    {
+        _metal += amount;
+    }
+    public void AddProject(Building.Type type)
+    {
+        _projects.Add(new Building(type));
+    }
+    public void AddWood(int amount)
+    {
+        _wood += amount;
+    }
+    public void AddWorker(string name, Worker.WorkDelegate workDelegate)
+    {
+        if (!string.IsNullOrEmpty(name))
+        {
+            Worker worker = new Worker(name, workDelegate);
+            _workers.Add(worker);
+        }
+        else
+        {
+            _ui.WriteLine(_strings.Messages[AddWorkerNoName]);
+            // _ui.WriteLine(Strings.MessagesAddWorkerNoName);
+        }
         
     }
-    public void AddMetal()
+    public void Build(Building.Type type)
     {
+        _buildings.Add((new Building(type)));
+
+        // Checks how many houses the village has after the latest building has been built.
+        var numberOfHouses = 0;
+        foreach (var building in _buildings)
+        {
+            if (building.BuildingType == Building.Type.House)
+            {
+                numberOfHouses += 1;
+            }
+        }
         
-    }
-    public void AddProject(string name)
-    {
-        
-    }
-    public void AddWood()
-    {
-
-    }
-    public void AddWorker(string name, Worker.Work work)
-    {
-
-    }
-    public void Build()
-    {
-
+        // For every house, allow 2 workers to live in the village.
+        for (int i = 0; i < numberOfHouses; i++)
+        {
+            _maxWorkers += 2;
+        }
     }
     public void BuryDead()
     {
-
+        foreach (var worker in _workers)
+        {
+            if (!worker.Alive)
+            {
+                _workers.Remove(worker);
+            }
+        }
+        
+        // If all workers of the village are dead and buried, the game is over.
+        _gameOver = true;
+        _ui.WriteLine("Game Over!");
     }
-    public void Day()
-    {
 
+    private void FeedWorkers(int amount)
+    {
+        foreach (var worker in _workers)
+        {
+            // If the village has got any food left, the worker can be fed. Only if they're alive, though.
+            if (_food > 0 && worker.Alive)
+            {
+                // The amount of food each worker consumes is subtracted from the village's resources.
+                _food -= amount;
+
+                // The worker is not hungry after having been fed.
+                worker.Hungry = false;
+                worker.DaysHungry = 0;
+            }
+            else
+            {
+                // The village has no food left, thus the worker gets hungry.
+                worker.Hungry = true;
+                worker.DaysHungry += 1;
+                if (worker.DaysHungry == 40)
+                {
+                    worker.Alive = false;
+                }
+            }
+        }
+        
     }
-    public void FeedWorkers()
+    public int GetDaysGone()
     {
-
+        return this._daysGone;
     }
-    public void GetDaysGone()
+    public int GetFoodPerDay()
     {
-
+        return this._foodPerDay;
     }
-    public void GetFoodPerDay()
+    public int GetMetal()
     {
-
+        return this._metal;
     }
-    public void GetMetal()
+    public int GetMetalPerDay()
     {
-
+        return this._metalPerDay;
     }
-    public void GetMetalPerDay()
+    public List<Building> GetProjects()
     {
-
+        return this._projects;
     }
-    public void GetProjects()
+    public int GetWood()
     {
-
+        return this._wood;
     }
-    public void GetWood()
+    public int GetWoodPerDay()
     {
-
+        return this._woodPerDay;
     }
-    public void GetWoodPerDay()
+    public List<Worker> GetWorkers()
     {
-
+        return this._workers;
     }
-    public void GetWorkers()
+    public int GetMaxWorkers()
     {
-
+        return this._maxWorkers;
     }
 
     public int GetFood()
