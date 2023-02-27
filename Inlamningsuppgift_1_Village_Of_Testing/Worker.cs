@@ -40,8 +40,4 @@ public class Worker
     {
         _workDelegate();
     }
-    public void FeedWorker()
-    {
-
-    }
 }

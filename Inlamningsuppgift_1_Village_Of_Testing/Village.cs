@@ -39,17 +39,21 @@ public class Village
     {
         do
         {
-            foreach(var worker in _workers)
+            for (var i = 0; i < _workers.Count; i++)
             {
+                var worker = _workers[i];
                 // Make the workers do the day's work. Only if they're not hungry, though.
                 if (!worker.Hungry && worker.Alive)
                 {
                     worker.DoWork();
                 }
-            
+
                 // Make the workers eat the amount each day.
                 FeedWorkers(1);
             }
+
+            _daysGone += 1;
+            
             // If we get Game Over after the day's events, the game ends.
         } while (!_gameOver);
     }
@@ -98,7 +102,8 @@ public class Village
             }
         }
         
-        // For every house, allow 2 workers to live in the village.
+        // For every house that exists in the village, allow 2 workers to live in the village.
+        _maxWorkers = 0; // Reset the counter first.
         for (int i = 0; i < numberOfHouses; i++)
         {
             _maxWorkers += 2;
@@ -106,23 +111,26 @@ public class Village
     }
     public void BuryDead()
     {
-        foreach (var worker in _workers)
+        for (var i = 0; i < _workers.Count; i++)
         {
+            var worker = _workers[i];
             if (!worker.Alive)
             {
                 _workers.Remove(worker);
             }
         }
-        
+
         // If all workers of the village are dead and buried, the game is over.
+        if (_workers.Count != 0) return;
         _gameOver = true;
         _ui.WriteLine("Game Over!");
     }
 
-    private void FeedWorkers(int amount)
+    public void FeedWorkers(int amount)
     {
-        foreach (var worker in _workers)
+        for (var i = 0; i < _workers.Count; i++)
         {
+            var worker = _workers[i];
             // If the village has got any food left, the worker can be fed. Only if they're alive, though.
             if (_food > 0 && worker.Alive)
             {
@@ -141,10 +149,10 @@ public class Village
                 if (worker.DaysHungry == 40)
                 {
                     worker.Alive = false;
+                    BuryDead();
                 }
             }
         }
-        
     }
     public int GetDaysGone()
     {

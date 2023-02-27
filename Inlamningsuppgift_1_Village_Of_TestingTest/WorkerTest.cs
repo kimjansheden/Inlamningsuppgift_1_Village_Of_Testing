@@ -61,4 +61,19 @@ public class WorkerTest : IClassFixture<VillageFixture>
         Assert.Equal(expectedMessage, actualMessage);
         _testOutputHelper.WriteLine(actualMessage);
     }
+
+    [Fact]
+    public void AddWorkerFailsNotEnoughHouses()
+    {
+        //Arrange
+        Village village = _villageFixture.Village;
+        village.AddWorker("Sven the Farmer", () => village.AddFood(5));
+        village.AddWorker("Bob the Quarry Man", () => village.AddMetal(1));
+        village.AddWorker("Olof the Lumberjack", () => village.AddWood(1));
+        village.AddWorker("Olof II the Lumberjack", () => village.AddWood(1));
+        village.AddWorker("Olof III the Lumberjack", () => village.AddWood(1));
+        village.AddWorker("Olof IV the Lumberjack", () => village.AddWood(1));
+        village.AddWorker("Olof V the Lumberjack", () => village.AddWood(1));
+        var expectedMaxWorkers = 6;
+    }
 }
