@@ -1,3 +1,4 @@
+using static Inlamningsuppgift_1_Village_Of_Testing.Strings;
 using static Inlamningsuppgift_1_Village_Of_Testing.Strings.Message;
 
 namespace Inlamningsuppgift_1_Village_Of_Testing;
@@ -27,10 +28,7 @@ public class Game
 
     public void Menu()
     {
-        _ui.WriteLine("What would you like to do?");
-        _ui.WriteLine("1. Add worker");
-        _ui.WriteLine("2. Next day");
-        _ui.WriteLine("3. Quit");
+        _ui.WriteLine(_strings.Messages[Message.Menu]);
         var input = _ui.ReadLine();
         switch(input)
         {
@@ -38,14 +36,22 @@ public class Game
                 AddWorkerInput();
                 break;
             case "2":
-                _village.Day();
+                AddProjectInput();
                 break;
             case "3":
+                _village.Day();
+                break;
+            case "4":
                 return;
             default:
                 _ui.WriteLine(_strings.Messages[MenuEnterValidNumber]);
                 break;
         }
+    }
+
+    private void AddProjectInput()
+    {
+        throw new NotImplementedException();
     }
 
     private void AddWorkerInput()
@@ -61,17 +67,17 @@ public class Game
         switch(input)
         {
             case "1":
-                _village.AddWorker(workerName, () => _village.AddWood(1));
+                _village.AddWorker(workerName, Worker.Type.Lumberjack, () => _village.AddWood());
                 break;
             case "2":
-                _village.AddWorker(workerName, () => _village.AddFood(5));
+                _village.AddWorker(workerName, Worker.Type.Farmer, () => _village.AddFood());
                 break;
             case "3":
-                _village.AddWorker(workerName, () => _village.AddMetal(1));
+                _village.AddWorker(workerName, Worker.Type.QuarryWorker, () => _village.AddMetal());
                 break;
             case "4":
                 // Kommer behöva prompta efter byggnadstyp också.
-                _village.AddWorker(workerName, () => _village.Build(Building.Type.House));
+                _village.AddWorker(workerName, Worker.Type.Builder, () => _village.AddProject(Building.Type.House));
                 break;
             default:
                 _ui.WriteLine(_strings.Messages[MenuEnterValidNumber]);

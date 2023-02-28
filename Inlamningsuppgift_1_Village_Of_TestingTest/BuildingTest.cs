@@ -2,13 +2,21 @@ using Inlamningsuppgift_1_Village_Of_Testing;
 
 namespace Inlamningsuppgift_1_Village_Of_TestingTest;
 
-public class BuildingTest
+public class BuildingTest : IClassFixture<VillageFixture>
 {
+    private VillageFixture _villageFixture;
+
+    public BuildingTest(VillageFixture villageFixture)
+    {
+        _villageFixture = villageFixture;
+    }
+
     [Fact]
     public void BuildingTypeHouseCosts5Wood()
     {
         //Arrange
-        Building building = new Building(Building.Type.House);
+        Village village = _villageFixture.Village;
+        Building building = new Building(Building.Type.House, village);
         var expectedWoodCost = 5;
         
         //Act
@@ -21,7 +29,8 @@ public class BuildingTest
     public void BuildingTypeHouseCosts0Metal()
     {
         //Arrange
-        Building building = new Building(Building.Type.House);
+        Village village = _villageFixture.Village;
+        Building building = new Building(Building.Type.House, village);
         var expectedMetalCost = 0;
         
         //Act
@@ -34,7 +43,8 @@ public class BuildingTest
     public void BuildingTypeHouseTakes3Days()
     {
         //Arrange
-        Building building = new Building(Building.Type.House);
+        Village village = _villageFixture.Village;
+        Building building = new Building(Building.Type.House, village);
         var expectedDays = 3;
         
         //Act
@@ -47,7 +57,8 @@ public class BuildingTest
     public void BuildingTypeHouseCosts5Wood0MetalTakes3Days()
     {
         //Arrange
-        Building building = new Building(Building.Type.House);
+        Village village = _villageFixture.Village;
+        Building building = new Building(Building.Type.House, village);
         var expectedWoodCost = 5;
         var expectedMetalCost = 0;
         var expectedDays = 3;
@@ -66,7 +77,8 @@ public class BuildingTest
     public void BuildingTypeWoodmillCosts5Wood1MetalTakes5Days()
     {
         //Arrange
-        Building building = new Building(Building.Type.Woodmill);
+        Village village = _villageFixture.Village;
+        Building building = new Building(Building.Type.Woodmill, village);
         var expectedWoodCost = 5;
         var expectedMetalCost = 1;
         var expectedDays = 5;
@@ -85,7 +97,8 @@ public class BuildingTest
     public void BuildingTypeQuarryCosts3Wood5MetalTakes7Days()
     {
         //Arrange
-        Building building = new Building(Building.Type.Quarry);
+        Village village = _villageFixture.Village;
+        Building building = new Building(Building.Type.Quarry, village);
         var expectedWoodCost = 3;
         var expectedMetalCost = 5;
         var expectedDays = 7;
@@ -104,7 +117,8 @@ public class BuildingTest
     public void BuildingTypeFarmCosts5Wood2MetalTakes5Days()
     {
         //Arrange
-        Building building = new Building(Building.Type.Farm);
+        Village village = _villageFixture.Village;
+        Building building = new Building(Building.Type.Farm, village);
         var expectedWoodCost = 5;
         var expectedMetalCost = 2;
         var expectedDays = 5;
@@ -123,7 +137,8 @@ public class BuildingTest
     public void BuildingTypeCastleCosts50Wood50MetalTakes50Days()
     {
         //Arrange
-        Building building = new Building(Building.Type.Castle);
+        Village village = _villageFixture.Village;
+        Building building = new Building(Building.Type.Castle, village);
         var expectedWoodCost = 50;
         var expectedMetalCost = 50;
         var expectedDays = 50;

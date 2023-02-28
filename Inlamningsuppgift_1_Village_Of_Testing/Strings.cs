@@ -6,11 +6,14 @@ public class Strings
     public enum Message
     {
         AddWorkerNoName,
-        MenuEnterValidNumber
+        MenuEnterValidNumber,
+        Menu,
+        BuildNoProjects
     }
     
     public Strings()
     {
+        var menuChoice = 0;
         Messages = new Dictionary<Message, string>
         {
             {
@@ -18,6 +21,16 @@ public class Strings
             },
             {
                 Message.MenuEnterValidNumber, "Please enter a valid option."
+            },
+            {
+                Message.Menu, "What would you like to do?\n" +
+                              $"{menuChoice += 1}. Add worker\n" +
+                              $"{menuChoice += 1}. Add project\n" +
+                              $"{menuChoice += 1}. Next day\n" +
+                              $"{menuChoice += 1}. Quit"
+            },
+            {
+                Message.BuildNoProjects, "You must add a project first."
             }
         };
     }

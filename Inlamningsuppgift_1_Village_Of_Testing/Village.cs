@@ -22,16 +22,20 @@ public class Village
     
     public bool GameOver => _gameOver;
 
+    public int FoodPerDay => _foodPerDay;
+
     public Village(IUI ui)
     {
         // Initialize the UI
         _ui = ui;
 
-        // Create three houses.
+        // A new village starts with three houses.
         for (int i = 0; i < 3; i++)
         {
-            //_buildings.Add((new Building(Building.Type.House)));
-            Build(Building.Type.House);
+            AddBuilding((new Building(Building.Type.House, this)));
+            
+            // The 3 houses come for free, so we must give the wood back that they cost.
+            AddWood(5);
         }
     }
     
@@ -53,28 +57,96 @@ public class Village
         _daysGone += 1;
     }
 
+    private void AddBuilding(Building project)
+    {
+        _projects.Remove(project);
+        _buildings.Add(project);
+        
+        // The building's special action is invoked.
+        project.BuildAction.Invoke(this);
+    }
+
+    public void AddHouse()
+    {
+        // For every house that exists in the village, allow 2 workers to live in the village.
+        _maxWorkers += 2;
+    }
+
+    public void AddWoodmill()
+    {
+        _woodPerDay += 2;
+    }
+    public void AddQuarry()
+    {
+        _metalPerDay += 2;
+    }
+    public void AddFarm()
+    {
+        _foodPerDay += 10;
+    }
+    public void AddCastle()
+    {
+        
+    }
+    public void AddFarmer()
+    {
+        _foodPerDay += 5;
+    }
+    public void AddLumberjack()
+    {
+        _woodPerDay += 1;
+    }
+    public void AddQuarryWorker()
+    {
+        _metalPerDay += 1;
+    }
+    public void AddBuilder()
+    {
+        
+    }
+    public void AddFood()
+    {
+        _food += FoodPerDay;
+    }
     public void AddFood(int amount)
     {
         _food += amount;
+    }
+    public void AddMetal()
+    {
+        _metal += _metalPerDay;
     }
     public void AddMetal(int amount)
     {
         _metal += amount;
     }
+    public void RemoveMetal(int amount)
+    {
+        _metal -= amount;
+    }
     public void AddProject(Building.Type type)
     {
-        _projects.Add(new Building(type));
+        _projects.Add(new Building(type, this));
+    }
+    public void AddWood()
+    {
+        _wood += _woodPerDay;
     }
     public void AddWood(int amount)
     {
         _wood += amount;
     }
-    public void AddWorker(string name, Worker.WorkDelegate workDelegate)
+    public void RemoveWood(int amount)
+    {
+        _wood -= amount;
+    }
+    public void AddWorker(string name, Worker.Type job, Worker.WorkDelegate workDelegate)
     {
         if (!string.IsNullOrEmpty(name))
         {
-            Worker worker = new Worker(name, workDelegate);
+            Worker worker = new Worker(name, job, workDelegate);
             _workers.Add(worker);
+            worker.JobAction.Invoke(this);
         }
         else
         {
@@ -83,26 +155,17 @@ public class Village
         }
         
     }
-    public void Build(Building.Type type)
+    public void Build()
     {
-        _buildings.Add((new Building(type)));
+        if (_projects.Count == 0)
+        {
+            _ui.WriteLine(_strings.Messages[BuildNoProjects]);
+            return;
+        }
+        var project = _projects[0];
+        project.WorkOn();
 
-        // Checks how many houses the village has after the latest building has been built.
-        var numberOfHouses = 0;
-        foreach (var building in _buildings)
-        {
-            if (building.BuildingType == Building.Type.House)
-            {
-                numberOfHouses += 1;
-            }
-        }
-        
-        // For every house that exists in the village, allow 2 workers to live in the village.
-        _maxWorkers = 0; // Reset the counter first.
-        for (int i = 0; i < numberOfHouses; i++)
-        {
-            _maxWorkers += 2;
-        }
+        if (project.IsComplete) AddBuilding(project);
     }
 
     private void BuryDead(Worker worker)
@@ -127,17 +190,15 @@ public class Village
                 _food -= amount;
 
                 // The worker is not hungry after having been fed.
-                worker.Hungry = false;
-                worker.DaysHungry = 0;
+                worker.Eat();
             }
             else
             {
                 // The village has no food left, thus the worker gets hungry.
-                worker.Hungry = true;
-                worker.DaysHungry += 1;
+                worker.Starve();
                 if (worker.DaysHungry == 40)
                 {
-                    worker.Alive = false;
+                    worker.Die();
                     BuryDead(worker);
                     
                     // When a worker is removed from the list,
@@ -156,7 +217,7 @@ public class Village
     }
     public int GetFoodPerDay()
     {
-        return this._foodPerDay;
+        return this.FoodPerDay;
     }
     public int GetMetal()
     {

@@ -20,7 +20,7 @@ public class WorkerTest : IClassFixture<VillageFixture>
     {
         //Arrange
         Village village = _villageFixture.Village;
-        Worker worker = new Worker("Sven", () => village.AddFood(5));
+        Worker worker = new Worker("Sven", Worker.Type.Farmer, () => village.AddFood());
         var expectedName = "Sven";
         
         //Act
@@ -34,7 +34,7 @@ public class WorkerTest : IClassFixture<VillageFixture>
     {
         //Arrange
         Village village = _villageFixture.Village;
-        village.AddWorker("Sven", () => village.AddFood(5));
+        village.AddWorker("Sven", Worker.Type.Farmer, () => village.AddFood());
         var expectedName = "Sven";
         
         //Act
@@ -42,6 +42,20 @@ public class WorkerTest : IClassFixture<VillageFixture>
         
         //Assert
         Assert.Equal(expectedName, actualName);
+    }
+    [Fact]
+    public void AddWorkerViaVillageWithJobFarmerCreatesANewWorkerWithJobFarmer()
+    {
+        //Arrange
+        Village village = _villageFixture.Village;
+        village.AddWorker("Sven", Worker.Type.Farmer, () => village.AddFood());
+        var expectedJob = Worker.Type.Farmer;
+        
+        //Act
+        var actualJob = village.GetWorkers()[0].Job;
+        
+        //Assert
+        Assert.Equal(expectedJob, actualJob);
     }
     [Fact]
     public void AddWorkerNoNameSendsExpectedMessage()
@@ -52,7 +66,7 @@ public class WorkerTest : IClassFixture<VillageFixture>
         var writer = new StringWriter();
         Console.SetOut(writer);
         var expectedMessage = strings.Messages[AddWorkerNoName];
-        village.AddWorker("", () => village.AddFood(5));
+        village.AddWorker("", Worker.Type.Farmer, () => village.AddFood());
 
         //Act
         var actualMessage = writer.ToString().Trim();
@@ -67,13 +81,13 @@ public class WorkerTest : IClassFixture<VillageFixture>
     {
         //Arrange
         Village village = _villageFixture.Village;
-        village.AddWorker("Sven the Farmer", () => village.AddFood(5));
-        village.AddWorker("Bob the Quarry Man", () => village.AddMetal(1));
-        village.AddWorker("Olof the Lumberjack", () => village.AddWood(1));
-        village.AddWorker("Olof II the Lumberjack", () => village.AddWood(1));
-        village.AddWorker("Olof III the Lumberjack", () => village.AddWood(1));
-        village.AddWorker("Olof IV the Lumberjack", () => village.AddWood(1));
-        village.AddWorker("Olof V the Lumberjack", () => village.AddWood(1));
+        village.AddWorker("Sven the Farmer", Worker.Type.Farmer, () => village.AddFood());
+        village.AddWorker("Bob the Quarry Man", Worker.Type.QuarryWorker, () => village.AddFood());
+        village.AddWorker("Olof the Lumberjack", Worker.Type.Lumberjack, () => village.AddFood());
+        village.AddWorker("Olof II the Lumberjack", Worker.Type.Lumberjack, () => village.AddFood());
+        village.AddWorker("Olof III the Lumberjack", Worker.Type.Lumberjack, () => village.AddFood());
+        village.AddWorker("Olof IV the Lumberjack", Worker.Type.Lumberjack, () => village.AddFood());
+        village.AddWorker("Olof V the Lumberjack", Worker.Type.Lumberjack, () => village.AddFood());
         var expectedMaxWorkers = 6;
     }
 }

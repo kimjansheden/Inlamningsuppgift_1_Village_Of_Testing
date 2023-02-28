@@ -83,10 +83,10 @@ public class VillageTest : IClassFixture<VillageFixture>
     {
         //Arrange
         Village village = _villageFixture.Village;
-        village.AddWorker("Sven the Farmer", () => village.AddFood(5));
-        village.AddWorker("Bob the Quarry Man", () => village.AddMetal(1));
-        village.AddWorker("Olof the Lumberjack", () => village.AddWood(1));
-        village.AddWorker("Daisy the Builder", () => village.AddProject(Building.Type.House));
+        village.AddWorker("Sven the Farmer", Worker.Type.Farmer, () => village.AddFood());
+        village.AddWorker("Bob the Quarry Man", Worker.Type.QuarryWorker, () => village.AddMetal());
+        village.AddWorker("Olof the Lumberjack", Worker.Type.Lumberjack, () => village.AddWood());
+        village.AddWorker("Daisy the Builder", Worker.Type.Builder, () => village.AddProject(Building.Type.House));
         
         var expectedFoodBeforeFeeding = 10;
         _testOutputHelper.WriteLine($"Expected food before feeding: {expectedFoodBeforeFeeding}");
@@ -155,10 +155,10 @@ public class VillageTest : IClassFixture<VillageFixture>
     {
         //Arrange
         Village village = _villageFixture.Village;
-        village.AddWorker("Sven the Farmer", () => village.AddFood(5));
-        village.AddWorker("Bob the Quarry Man", () => village.AddMetal(1));
-        village.AddWorker("Olof the Lumberjack", () => village.AddWood(1));
-        village.AddWorker("Daisy the Builder", () => village.AddProject(Building.Type.House));
+        village.AddWorker("Sven the Farmer", Worker.Type.Farmer, () => village.AddFood());
+        village.AddWorker("Bob the Quarry Man", Worker.Type.QuarryWorker, () => village.AddMetal());
+        village.AddWorker("Olof the Lumberjack", Worker.Type.Lumberjack, () => village.AddWood());
+        village.AddWorker("Daisy the Builder", Worker.Type.Builder, () => village.AddProject(Building.Type.House));
         
         village.FeedWorkers(1);
         village.FeedWorkers(1);
@@ -233,11 +233,11 @@ public class VillageTest : IClassFixture<VillageFixture>
         
         // Add the village and the workers.
         Village village = _villageFixture.Village;
-        village.AddWorker("Sven the Lumberjack", () => village.AddWood(1));
-        village.AddWorker("Bob the Quarry Man", () => village.AddMetal(1));
-        village.AddWorker("Olof the Lumberjack", () => village.AddWood(1));
-        village.AddWorker("Olof II the Lumberjack", () => village.AddWood(1));
-        village.AddWorker("Daisy the Builder", () => village.AddProject(Building.Type.House));
+        village.AddWorker("Sven the Lumberjack", Worker.Type.Lumberjack, () => village.AddWood());
+        village.AddWorker("Bob the Quarry Man", Worker.Type.QuarryWorker, () => village.AddMetal());
+        village.AddWorker("Olof the Lumberjack", Worker.Type.Lumberjack, () => village.AddWood());
+        village.AddWorker("Olof II the Lumberjack", Worker.Type.Lumberjack, () => village.AddWood());
+        village.AddWorker("Daisy the Builder", Worker.Type.Builder, () => village.AddProject(Building.Type.House));
         
         // Deplete the village of all food before the test begins.
         village.FeedWorkers(1);
@@ -327,11 +327,11 @@ public class VillageTest : IClassFixture<VillageFixture>
         
         // Add the village and the workers.
         Village village = _villageFixture.Village;
-        village.AddWorker("Sven the Lumberjack", () => village.AddWood(1));
-        village.AddWorker("Bob the Quarry Man", () => village.AddMetal(1));
-        village.AddWorker("Olof the Lumberjack", () => village.AddWood(1));
-        village.AddWorker("Olof II the Lumberjack", () => village.AddWood(1));
-        village.AddWorker("Daisy the Builder", () => village.AddProject(Building.Type.House));
+        village.AddWorker("Sven the Lumberjack", Worker.Type.Lumberjack, () => village.AddWood());
+        village.AddWorker("Bob the Quarry Man", Worker.Type.QuarryWorker, () => village.AddMetal());
+        village.AddWorker("Olof the Lumberjack", Worker.Type.Lumberjack, () => village.AddWood());
+        village.AddWorker("Olof II the Lumberjack", Worker.Type.Lumberjack, () => village.AddWood());
+        village.AddWorker("Daisy the Builder", Worker.Type.Builder, () => village.AddProject(Building.Type.House));
         
         // Deplete the village of all food but 2 before the test begins.
         village.FeedWorkers(1);
@@ -421,11 +421,11 @@ public class VillageTest : IClassFixture<VillageFixture>
         
         // Add the village and the workers.
         Village village = _villageFixture.Village;
-        village.AddWorker("Sven the Lumberjack", () => village.AddWood(1));
-        village.AddWorker("Bob the Quarry Man", () => village.AddMetal(1));
-        village.AddWorker("Olof the Lumberjack", () => village.AddWood(1));
-        village.AddWorker("Olof II the Lumberjack", () => village.AddWood(1));
-        village.AddWorker("Daisy the Builder", () => village.AddProject(Building.Type.House));
+        village.AddWorker("Sven the Lumberjack", Worker.Type.Lumberjack, () => village.AddWood());
+        village.AddWorker("Bob the Quarry Man", Worker.Type.QuarryWorker, () => village.AddMetal());
+        village.AddWorker("Olof the Lumberjack", Worker.Type.Lumberjack, () => village.AddWood());
+        village.AddWorker("Olof II the Lumberjack", Worker.Type.Lumberjack, () => village.AddWood());
+        village.AddWorker("Daisy the Builder", Worker.Type.Builder, () => village.AddProject(Building.Type.House));
         
         // Deplete the village of all food but 2 before the test begins.
         village.AddFood(1);
@@ -516,7 +516,7 @@ public class VillageTest : IClassFixture<VillageFixture>
         
         // Add the village and the workers.
         Village village = _villageFixture.Village;
-        village.AddWorker("Sven the Farmer", () => village.AddFood(5));
+        village.AddWorker("Sven the Farmer", Worker.Type.Farmer, () => village.AddFood());
 
         // One farmer brings in 5 food and eats 1 food. The village starts with 10 food. Therefore, the village should have 14 food after one day.
         var expectedFoodAtTheEndOfDay = 14;
@@ -654,5 +654,512 @@ public class VillageTest : IClassFixture<VillageFixture>
         
         //Assert
         Assert.Equal(expectedWorkers, actualWorkers);
+    }
+    
+    [Fact]
+    public void BuildAWoodMillCompleteAfter5DaysIncreasesWoodPerDayBy2DecreasesMetalBy1AndWoodBy5()
+    {
+        //Arrange
+        Village village = _villageFixture.Village;
+        village.AddWorker("Leif", Worker.Type.Builder, () => village.Build());
+        
+        // The village starts with the resources expected to build the building being tested.
+        var expectedMetalDeducted = 1;
+        var expectedWoodDeducted = 5;
+        village.AddMetal(expectedMetalDeducted);
+        village.AddWood(expectedWoodDeducted);
+        
+        village.AddProject(Building.Type.Woodmill);
+        var project = village.GetProjects()[0]; 
+        
+        var expectedWoodPerDayBeforeWoodMill = 0;
+        _testOutputHelper.WriteLine($"Expected wood per day before the woodmill is built: {expectedWoodPerDayBeforeWoodMill}");
+        
+        var expectedDaysPassed = 5;
+        _testOutputHelper.WriteLine($"Expected days having passed (the required days needed to build the building): {expectedDaysPassed}");
+        
+        var expectedComplete = true;
+        _testOutputHelper.WriteLine($"Expected completion status of the building after the days required to build it have passed: {expectedComplete}");
+        
+        var expectedProjectListCount = 0;
+        _testOutputHelper.WriteLine($"Expected unfinished projects after the woodmill is built: {expectedProjectListCount}");
+        
+        var expectedBuildingListCount = 4; // Because the village starts with 3 houses.
+        _testOutputHelper.WriteLine($"Expected number of buildings in the village after the woodmill is built: {expectedBuildingListCount}");
+        
+        var expectedBuildingTypeInList = Building.Type.Woodmill;
+        _testOutputHelper.WriteLine($"Expected building type of the building we just built: {expectedBuildingTypeInList}");
+        
+        var expectedWoodPerDayAfterWoodMill = 2;
+        _testOutputHelper.WriteLine($"Expected wood per day after the woodmill is built: {expectedWoodPerDayAfterWoodMill}");
+        
+        var expectedMetalAfterComplete = 0;
+        _testOutputHelper.WriteLine($"Expected metal in the village after the building is built: {expectedMetalAfterComplete}");
+        
+        var expectedWoodAfterComplete = 0;
+        _testOutputHelper.WriteLine($"Expected wood in the village after the building is built: {expectedWoodAfterComplete}");
+        
+        _testOutputHelper.WriteLine("");
+
+        //Act
+        var actualWoodPerDayBeforeWoodMill = village.GetWoodPerDay();
+        _testOutputHelper.WriteLine($"Actual wood per day before the woodmill is built: {actualWoodPerDayBeforeWoodMill}");
+
+        for (int i = 0; i < expectedDaysPassed; i++)
+        {
+            village.Day();
+        }
+        
+        var actualDaysPassed = village.GetDaysGone();
+        _testOutputHelper.WriteLine($"Actual days having passed (the required days needed to build the building): {actualDaysPassed}");
+        
+        var actualComplete = project.IsComplete;
+        _testOutputHelper.WriteLine($"Actual completion status of the building after the days required to build it have passed: {actualComplete}");
+        
+        var actualProjectListCount = village.GetProjects().Count;
+        _testOutputHelper.WriteLine($"Actual unfinished projects after the woodmill is built: {actualProjectListCount}");
+        
+        var actualBuildingListCount = village.GetBuildings().Count;
+        _testOutputHelper.WriteLine($"Actual number of buildings in the village after the woodmill is built: {actualBuildingListCount}");
+        
+        var actualBuildingTypeInList = village.GetBuildings()[village.GetBuildings().Count - 1].BuildingType; // The new building will end up as the last element of the list.
+        _testOutputHelper.WriteLine($"Actual building type of the building we just built: {actualBuildingTypeInList}");
+        
+        var actualWoodPerDayAfterWoodMill = village.GetWoodPerDay();
+        _testOutputHelper.WriteLine($"Expected wood per day after the woodmill is built: {actualWoodPerDayAfterWoodMill}");
+        
+        var actualMetalAfterComplete = village.GetMetal();
+        _testOutputHelper.WriteLine($"Actual metal in the village after the building is built: {actualMetalAfterComplete}");
+        
+        var actualWoodAfterComplete = village.GetWood();
+        _testOutputHelper.WriteLine($"Actual wood in the village after the building is built: {actualWoodAfterComplete}");
+        
+        //Assert
+        Assert.Equal(expectedWoodPerDayBeforeWoodMill, actualWoodPerDayBeforeWoodMill);
+        Assert.Equal(expectedDaysPassed, actualDaysPassed);
+        Assert.Equal(expectedComplete, actualComplete);
+        Assert.Equal(expectedProjectListCount, actualProjectListCount);
+        Assert.Equal(expectedProjectListCount, actualProjectListCount);
+        Assert.Equal(expectedBuildingListCount, actualBuildingListCount);
+        Assert.Equal(expectedBuildingTypeInList, actualBuildingTypeInList);
+        Assert.Equal(expectedWoodPerDayAfterWoodMill, actualWoodPerDayAfterWoodMill);
+        Assert.Equal(expectedMetalAfterComplete, actualMetalAfterComplete);
+        Assert.Equal(expectedWoodAfterComplete, actualWoodAfterComplete);
+    }
+    [Fact]
+    public void BuildAHouseCompleteAfter3DaysDecreasesWoodBy5()
+    {
+        //Arrange
+        Village village = _villageFixture.Village;
+        village.AddWorker("Leif", Worker.Type.Builder, () => village.Build());
+        
+        // The village starts with the resources expected to build the building being tested.
+        var expectedWoodDeducted = 5;
+        village.AddWood(expectedWoodDeducted);
+        
+        village.AddProject(Building.Type.House);
+        var project = village.GetProjects()[0]; 
+        
+        var expectedDaysPassed = 5;
+        _testOutputHelper.WriteLine($"Expected days having passed (the required days needed to build the building): {expectedDaysPassed}");
+        
+        var expectedComplete = true;
+        _testOutputHelper.WriteLine($"Expected completion status of the building after the days required to build it have passed: {expectedComplete}");
+        
+        var expectedProjectListCount = 0;
+        _testOutputHelper.WriteLine($"Expected unfinished projects after the woodmill is built: {expectedProjectListCount}");
+        
+        var expectedBuildingListCount = 4; // Because the village starts with 3 houses.
+        _testOutputHelper.WriteLine($"Expected number of buildings in the village after the house is built: {expectedBuildingListCount}");
+        
+        var expectedBuildingTypeInList = Building.Type.House;
+        _testOutputHelper.WriteLine($"Expected building type of the building we just built: {expectedBuildingTypeInList}");
+        
+        var expectedWoodAfterComplete = 0;
+        _testOutputHelper.WriteLine($"Expected wood in the village after the building is built: {expectedWoodAfterComplete}");
+        
+        _testOutputHelper.WriteLine("");
+
+        //Act
+        for (int i = 0; i < expectedDaysPassed; i++)
+        {
+            village.Day();
+        }
+        
+        var actualDaysPassed = village.GetDaysGone();
+        _testOutputHelper.WriteLine($"Actual days having passed (the required days needed to build the building): {actualDaysPassed}");
+        
+        var actualComplete = project.IsComplete;
+        _testOutputHelper.WriteLine($"Actual completion status of the building after the days required to build it have passed: {actualComplete}");
+        
+        var actualProjectListCount = village.GetProjects().Count;
+        _testOutputHelper.WriteLine($"Actual unfinished projects after the woodmill is built: {actualProjectListCount}");
+        
+        var actualBuildingListCount = village.GetBuildings().Count;
+        _testOutputHelper.WriteLine($"Actual number of buildings in the village after the house is built: {actualBuildingListCount}");
+        
+        var actualBuildingTypeInList = village.GetBuildings()[village.GetBuildings().Count - 1].BuildingType; // The new building will end up as the last element of the list.
+        _testOutputHelper.WriteLine($"Actual building type of the building we just built: {actualBuildingTypeInList}");
+        
+        var actualWoodAfterComplete = village.GetWood();
+        _testOutputHelper.WriteLine($"Actual wood in the village after the building is built: {actualWoodAfterComplete}");
+        
+        //Assert
+        Assert.Equal(expectedDaysPassed, actualDaysPassed);
+        Assert.Equal(expectedComplete, actualComplete);
+        Assert.Equal(expectedProjectListCount, actualProjectListCount);
+        Assert.Equal(expectedProjectListCount, actualProjectListCount);
+        Assert.Equal(expectedBuildingListCount, actualBuildingListCount);
+        Assert.Equal(expectedBuildingTypeInList, actualBuildingTypeInList);
+        Assert.Equal(expectedWoodAfterComplete, actualWoodAfterComplete);
+    }
+    [Fact]
+    public void BuildAQuarryCompleteAfter7DaysIncreasesMetalPerDayBy2DecreasesMetalBy5AndWoodBy3()
+    {
+        //Arrange
+        Village village = _villageFixture.Village;
+        village.AddWorker("Leif", Worker.Type.Builder, () => village.Build());
+        
+        // The village starts with the resources expected to build the building being tested.
+        var expectedMetalDeducted = 5;
+        var expectedWoodDeducted = 3;
+        
+        village.AddMetal(expectedMetalDeducted);
+        village.AddWood(expectedWoodDeducted);
+        village.AddProject(Building.Type.Quarry);
+        var project = village.GetProjects()[0]; 
+        
+        var expectedMetalPerDayBeforeQuarry = 0;
+        _testOutputHelper.WriteLine($"Expected metal per day before the quarry is built: {expectedMetalPerDayBeforeQuarry}");
+        
+        var expectedDaysPassed = 7;
+        _testOutputHelper.WriteLine($"Expected days having passed (the required days needed to build the building): {expectedDaysPassed}");
+        
+        var expectedComplete = true;
+        _testOutputHelper.WriteLine($"Expected completion status of the building after the days required to build it have passed: {expectedComplete}");
+        
+        var expectedProjectListCount = 0;
+        _testOutputHelper.WriteLine($"Expected unfinished projects after the woodmill is built: {expectedProjectListCount}");
+        
+        var expectedBuildingListCount = 4; // Because the village starts with 3 houses.
+        _testOutputHelper.WriteLine($"Expected number of buildings in the village after the woodmill is built: {expectedBuildingListCount}");
+        
+        var expectedBuildingTypeInList = Building.Type.Quarry;
+        _testOutputHelper.WriteLine($"Expected building type of the building we just built: {expectedBuildingTypeInList}");
+        
+        var expectedMetalPerDayAfterQuarry = 2;
+        _testOutputHelper.WriteLine($"Expected metal per day after the quarry is built: {expectedMetalPerDayAfterQuarry}");
+
+        var expectedMetalAfterComplete = 0;
+        _testOutputHelper.WriteLine($"Expected metal in the village after the building is built: {expectedMetalAfterComplete}");
+
+        var expectedWoodAfterComplete = 0;
+        _testOutputHelper.WriteLine($"Expected wood in the village after the building is built: {expectedWoodAfterComplete}");
+        
+        _testOutputHelper.WriteLine("");
+
+        //Act
+        var actualMetalPerDayBeforeQuarry = village.GetMetalPerDay();
+        _testOutputHelper.WriteLine($"Actual metal per day before the quarry is built: {actualMetalPerDayBeforeQuarry}");
+        
+        for (int i = 0; i < expectedDaysPassed; i++)
+        {
+            village.Day();
+        }
+        
+        var actualDaysPassed = village.GetDaysGone();
+        _testOutputHelper.WriteLine($"Actual days having passed (the required days needed to build the building): {actualDaysPassed}");
+        
+        var actualComplete = project.IsComplete;
+        _testOutputHelper.WriteLine($"Actual completion status of the building after the days required to build it have passed: {actualComplete}");
+        
+        var actualProjectListCount = village.GetProjects().Count;
+        _testOutputHelper.WriteLine($"Actual unfinished projects after the woodmill is built: {actualProjectListCount}");
+        
+        var actualBuildingListCount = village.GetBuildings().Count;
+        _testOutputHelper.WriteLine($"Actual number of buildings in the village after the building is built: {actualBuildingListCount}");
+        
+        var actualBuildingTypeInList = village.GetBuildings()[village.GetBuildings().Count - 1].BuildingType; // The new building will end up as the last element of the list.
+        _testOutputHelper.WriteLine($"Actual building type of the building we just built: {actualBuildingTypeInList}");
+        
+        var actualMetalPerDayAfterQuarry = village.GetMetalPerDay();
+        _testOutputHelper.WriteLine($"Expected metal per day after the quarry is built: {actualMetalPerDayAfterQuarry}");
+        
+        var actualMetalAfterComplete = village.GetMetal();
+        _testOutputHelper.WriteLine($"Actual metal in the village after the building is built: {actualMetalAfterComplete}");
+        
+        var actualWoodAfterComplete = village.GetWood();
+        _testOutputHelper.WriteLine($"Actual wood in the village after the building is built: {actualWoodAfterComplete}");
+        
+        //Assert
+        Assert.Equal(expectedMetalPerDayBeforeQuarry, actualMetalPerDayBeforeQuarry);
+        Assert.Equal(expectedDaysPassed, actualDaysPassed);
+        Assert.Equal(expectedComplete, actualComplete);
+        Assert.Equal(expectedProjectListCount, actualProjectListCount);
+        Assert.Equal(expectedProjectListCount, actualProjectListCount);
+        Assert.Equal(expectedBuildingListCount, actualBuildingListCount);
+        Assert.Equal(expectedBuildingTypeInList, actualBuildingTypeInList);
+        Assert.Equal(expectedMetalPerDayAfterQuarry, actualMetalPerDayAfterQuarry);
+        Assert.Equal(expectedMetalAfterComplete, actualMetalAfterComplete);
+        Assert.Equal(expectedWoodAfterComplete, actualWoodAfterComplete);
+    }
+    [Fact]
+    public void BuildAFarmCompleteAfter5DaysIncreasesFoodPerDayBy10DecreasesMetalBy2AndWoodBy5()
+    {
+        //Arrange
+        Village village = _villageFixture.Village;
+        village.AddWorker("Leif", Worker.Type.Builder, () => village.Build());
+        
+        // The village starts with the resources expected to build the building being tested.
+        var expectedMetalDeducted = 2;
+        var expectedWoodDeducted = 5;
+        
+        village.AddMetal(expectedMetalDeducted);
+        village.AddWood(expectedWoodDeducted);
+        village.AddProject(Building.Type.Farm);
+        var project = village.GetProjects()[0]; 
+        
+        var expectedFoodPerDayBeforeFarm = 0;
+        _testOutputHelper.WriteLine($"Expected food per day before the farm is built: {expectedFoodPerDayBeforeFarm}");
+        
+        var expectedDaysPassed = 5;
+        _testOutputHelper.WriteLine($"Expected days having passed (the required days needed to build the building): {expectedDaysPassed}");
+        
+        var expectedComplete = true;
+        _testOutputHelper.WriteLine($"Expected completion status of the building after the days required to build it have passed: {expectedComplete}");
+        
+        var expectedProjectListCount = 0;
+        _testOutputHelper.WriteLine($"Expected unfinished projects after the woodmill is built: {expectedProjectListCount}");
+        
+        var expectedBuildingListCount = 4; // Because the village starts with 3 houses.
+        _testOutputHelper.WriteLine($"Expected number of buildings in the village after the building is built: {expectedBuildingListCount}");
+        
+        var expectedBuildingTypeInList = Building.Type.Farm;
+        _testOutputHelper.WriteLine($"Expected building type of the building we just built: {expectedBuildingTypeInList}");
+        
+        var expectedFoodPerDayAfterFarm = 10;
+        _testOutputHelper.WriteLine($"Expected food per day after the farm is built: {expectedFoodPerDayAfterFarm}");
+
+        var expectedMetalAfterComplete = 0;
+        _testOutputHelper.WriteLine($"Expected metal in the village after the building is built: {expectedMetalAfterComplete}");
+
+        var expectedWoodAfterComplete = 0;
+        _testOutputHelper.WriteLine($"Expected wood in the village after the building is built: {expectedWoodAfterComplete}");
+        
+        _testOutputHelper.WriteLine("");
+
+        //Act
+        var actualFoodPerDayBeforeFarm = village.GetFoodPerDay();
+        _testOutputHelper.WriteLine($"Actual food per day before the farm is built: {actualFoodPerDayBeforeFarm}");
+        
+        for (int i = 0; i < expectedDaysPassed; i++)
+        {
+            village.Day();
+        }
+        
+        var actualDaysPassed = village.GetDaysGone();
+        _testOutputHelper.WriteLine($"Actual days having passed (the required days needed to build the building): {actualDaysPassed}");
+        
+        var actualComplete = project.IsComplete;
+        _testOutputHelper.WriteLine($"Actual completion status of the building after the days required to build it have passed: {actualComplete}");
+        
+        var actualProjectListCount = village.GetProjects().Count;
+        _testOutputHelper.WriteLine($"Actual unfinished projects after the woodmill is built: {actualProjectListCount}");
+        
+        var actualBuildingListCount = village.GetBuildings().Count;
+        _testOutputHelper.WriteLine($"Actual number of buildings in the village after the building is built: {actualBuildingListCount}");
+        
+        var actualBuildingTypeInList = village.GetBuildings()[village.GetBuildings().Count - 1].BuildingType; // The new building will end up as the last element of the list.
+        _testOutputHelper.WriteLine($"Actual building type of the building we just built: {actualBuildingTypeInList}");
+        
+        var actualFoodPerDayAfterFarm = village.GetFoodPerDay();
+        _testOutputHelper.WriteLine($"Expected food per day after the farm is built: {actualFoodPerDayAfterFarm}");
+        
+        var actualMetalAfterComplete = village.GetMetal();
+        _testOutputHelper.WriteLine($"Actual metal in the village after the building is built: {actualMetalAfterComplete}");
+        
+        var actualWoodAfterComplete = village.GetWood();
+        _testOutputHelper.WriteLine($"Actual wood in the village after the building is built: {actualWoodAfterComplete}");
+        
+        //Assert
+        Assert.Equal(expectedFoodPerDayBeforeFarm, actualFoodPerDayBeforeFarm);
+        Assert.Equal(expectedDaysPassed, actualDaysPassed);
+        Assert.Equal(expectedComplete, actualComplete);
+        Assert.Equal(expectedProjectListCount, actualProjectListCount);
+        Assert.Equal(expectedProjectListCount, actualProjectListCount);
+        Assert.Equal(expectedBuildingListCount, actualBuildingListCount);
+        Assert.Equal(expectedBuildingTypeInList, actualBuildingTypeInList);
+        Assert.Equal(expectedFoodPerDayAfterFarm, actualFoodPerDayAfterFarm);
+        Assert.Equal(expectedMetalAfterComplete, actualMetalAfterComplete);
+        Assert.Equal(expectedWoodAfterComplete, actualWoodAfterComplete);
+    }
+    [Fact]
+    public void BuildACastleCompleteAfter50DaysDecreasesMetalBy50AndWoodBy50()
+    {
+        //Arrange
+        Village village = _villageFixture.Village;
+        village.AddWorker("Leif", Worker.Type.Builder, () => village.Build());
+        
+        // The village starts with the resources expected to build the building being tested.
+        var expectedMetalDeducted = 50;
+        var expectedWoodDeducted = 50;
+        var expectedFoodEaten = 50;
+        
+        village.AddMetal(expectedMetalDeducted);
+        village.AddWood(expectedWoodDeducted);
+        village.AddFood(expectedFoodEaten);
+        village.AddProject(Building.Type.Castle);
+        var project = village.GetProjects()[0];
+
+        var expectedDaysPassed = 50;
+        _testOutputHelper.WriteLine($"Expected days having passed (the required days needed to build the building): {expectedDaysPassed}");
+        
+        var expectedComplete = true;
+        _testOutputHelper.WriteLine($"Expected completion status of the building after the days required to build it have passed: {expectedComplete}");
+        
+        var expectedProjectListCount = 0;
+        _testOutputHelper.WriteLine($"Expected unfinished projects after the building is built: {expectedProjectListCount}");
+        
+        var expectedBuildingListCount = 4; // Because the village starts with 3 houses.
+        _testOutputHelper.WriteLine($"Expected number of buildings in the village after the building is built: {expectedBuildingListCount}");
+        
+        var expectedBuildingTypeInList = Building.Type.Castle;
+        _testOutputHelper.WriteLine($"Expected building type of the building we just built: {expectedBuildingTypeInList}");
+
+        var expectedMetalAfterComplete = 0;
+        _testOutputHelper.WriteLine($"Expected metal in the village after the building is built: {expectedMetalAfterComplete}");
+
+        var expectedWoodAfterComplete = 0;
+        _testOutputHelper.WriteLine($"Expected wood in the village after the building is built: {expectedWoodAfterComplete}");
+        
+        _testOutputHelper.WriteLine("");
+
+        //Act
+
+        for (int i = 0; i < expectedDaysPassed; i++)
+        {
+            village.Day();
+        }
+        
+        var actualDaysPassed = village.GetDaysGone();
+        _testOutputHelper.WriteLine($"Actual days having passed (the required days needed to build the building): {actualDaysPassed}");
+        
+        var actualComplete = project.IsComplete;
+        _testOutputHelper.WriteLine($"Actual completion status of the building after the days required to build it have passed: {actualComplete}");
+        
+        var actualProjectListCount = village.GetProjects().Count;
+        _testOutputHelper.WriteLine($"Actual unfinished projects after the building is built: {actualProjectListCount}");
+        
+        var actualBuildingListCount = village.GetBuildings().Count;
+        _testOutputHelper.WriteLine($"Actual number of buildings in the village after the building is built: {actualBuildingListCount}");
+        
+        var actualBuildingTypeInList = village.GetBuildings()[village.GetBuildings().Count - 1].BuildingType; // The new building will end up as the last element of the list.
+        _testOutputHelper.WriteLine($"Actual building type of the building we just built: {actualBuildingTypeInList}");
+
+        var actualMetalAfterComplete = village.GetMetal();
+        _testOutputHelper.WriteLine($"Actual metal in the village after the building is built: {actualMetalAfterComplete}");
+        
+        var actualWoodAfterComplete = village.GetWood();
+        _testOutputHelper.WriteLine($"Actual wood in the village after the building is built: {actualWoodAfterComplete}");
+        
+        //Assert
+        Assert.Equal(expectedDaysPassed, actualDaysPassed);
+        Assert.Equal(expectedComplete, actualComplete);
+        Assert.Equal(expectedProjectListCount, actualProjectListCount);
+        Assert.Equal(expectedProjectListCount, actualProjectListCount);
+        Assert.Equal(expectedBuildingListCount, actualBuildingListCount);
+        Assert.Equal(expectedBuildingTypeInList, actualBuildingTypeInList);
+        Assert.Equal(expectedMetalAfterComplete, actualMetalAfterComplete);
+        Assert.Equal(expectedWoodAfterComplete, actualWoodAfterComplete);
+    }
+    //[Fact]
+    public void BuildACastleMessageIsDisplayedTook50DaysToBuild()
+    {
+        //Arrange
+        Village village = _villageFixture.Village;
+        village.AddWorker("Leif", Worker.Type.Builder, () => village.Build());
+        
+        // The village starts with the resources expected to build the building being tested.
+        var expectedMetalDeducted = 2;
+        var expectedWoodDeducted = 5;
+        
+        village.AddMetal(expectedMetalDeducted);
+        village.AddWood(expectedWoodDeducted);
+        village.AddProject(Building.Type.Farm);
+        var project = village.GetProjects()[0]; 
+        
+        var expectedFoodPerDayBeforeFarm = 0;
+        _testOutputHelper.WriteLine($"Expected food per day before the farm is built: {expectedFoodPerDayBeforeFarm}");
+        
+        var expectedDaysPassed = 5;
+        _testOutputHelper.WriteLine($"Expected days having passed (the required days needed to build the building): {expectedDaysPassed}");
+        
+        var expectedComplete = true;
+        _testOutputHelper.WriteLine($"Expected completion status of the building after the days required to build it have passed: {expectedComplete}");
+        
+        var expectedProjectListCount = 0;
+        _testOutputHelper.WriteLine($"Expected unfinished projects after the woodmill is built: {expectedProjectListCount}");
+        
+        var expectedBuildingListCount = 4; // Because the village starts with 3 houses.
+        _testOutputHelper.WriteLine($"Expected number of buildings in the village after the building is built: {expectedBuildingListCount}");
+        
+        var expectedBuildingTypeInList = Building.Type.Farm;
+        _testOutputHelper.WriteLine($"Expected building type of the building we just built: {expectedBuildingTypeInList}");
+        
+        var expectedFoodPerDayAfterFarm = 10;
+        _testOutputHelper.WriteLine($"Expected food per day after the farm is built: {expectedFoodPerDayAfterFarm}");
+
+        var expectedMetalAfterComplete = 0;
+        _testOutputHelper.WriteLine($"Expected metal in the village after the building is built: {expectedMetalAfterComplete}");
+
+        var expectedWoodAfterComplete = 0;
+        _testOutputHelper.WriteLine($"Expected wood in the village after the building is built: {expectedWoodAfterComplete}");
+        
+        _testOutputHelper.WriteLine("");
+
+        //Act
+        var actualFoodPerDayBeforeFarm = village.GetFoodPerDay();
+        _testOutputHelper.WriteLine($"Actual food per day before the farm is built: {actualFoodPerDayBeforeFarm}");
+        
+        for (int i = 0; i < expectedDaysPassed; i++)
+        {
+            village.Day();
+        }
+        
+        var actualDaysPassed = village.GetDaysGone();
+        _testOutputHelper.WriteLine($"Actual days having passed (the required days needed to build the building): {actualDaysPassed}");
+        
+        var actualComplete = project.IsComplete;
+        _testOutputHelper.WriteLine($"Actual completion status of the building after the days required to build it have passed: {actualComplete}");
+        
+        var actualProjectListCount = village.GetProjects().Count;
+        _testOutputHelper.WriteLine($"Actual unfinished projects after the woodmill is built: {actualProjectListCount}");
+        
+        var actualBuildingListCount = village.GetBuildings().Count;
+        _testOutputHelper.WriteLine($"Actual number of buildings in the village after the building is built: {actualBuildingListCount}");
+        
+        var actualBuildingTypeInList = village.GetBuildings()[village.GetBuildings().Count - 1].BuildingType; // The new building will end up as the last element of the list.
+        _testOutputHelper.WriteLine($"Actual building type of the building we just built: {actualBuildingTypeInList}");
+        
+        var actualFoodPerDayAfterFarm = village.GetFoodPerDay();
+        _testOutputHelper.WriteLine($"Expected food per day after the farm is built: {actualFoodPerDayAfterFarm}");
+        
+        var actualMetalAfterComplete = village.GetMetal();
+        _testOutputHelper.WriteLine($"Actual metal in the village after the building is built: {actualMetalAfterComplete}");
+        
+        var actualWoodAfterComplete = village.GetWood();
+        _testOutputHelper.WriteLine($"Actual wood in the village after the building is built: {actualWoodAfterComplete}");
+        
+        //Assert
+        Assert.Equal(expectedFoodPerDayBeforeFarm, actualFoodPerDayBeforeFarm);
+        Assert.Equal(expectedDaysPassed, actualDaysPassed);
+        Assert.Equal(expectedComplete, actualComplete);
+        Assert.Equal(expectedProjectListCount, actualProjectListCount);
+        Assert.Equal(expectedProjectListCount, actualProjectListCount);
+        Assert.Equal(expectedBuildingListCount, actualBuildingListCount);
+        Assert.Equal(expectedBuildingTypeInList, actualBuildingTypeInList);
+        Assert.Equal(expectedFoodPerDayAfterFarm, actualFoodPerDayAfterFarm);
+        Assert.Equal(expectedMetalAfterComplete, actualMetalAfterComplete);
+        Assert.Equal(expectedWoodAfterComplete, actualWoodAfterComplete);
     }
 }
