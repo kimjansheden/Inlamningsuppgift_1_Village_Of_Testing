@@ -233,7 +233,7 @@ public class VillageTest : IClassFixture<VillageFixture>
         
         // Add the village and the workers.
         Village village = _villageFixture.Village;
-        village.AddWorker("Sven the Farmer", () => village.AddFood(5));
+        village.AddWorker("Sven the Lumberjack", () => village.AddWood(1));
         village.AddWorker("Bob the Quarry Man", () => village.AddMetal(1));
         village.AddWorker("Olof the Lumberjack", () => village.AddWood(1));
         village.AddWorker("Olof II the Lumberjack", () => village.AddWood(1));
@@ -248,6 +248,8 @@ public class VillageTest : IClassFixture<VillageFixture>
         _testOutputHelper.WriteLine($"Expected food before feeding: {expectedFoodBeforeFeeding}");
         var expectedFoodAfterFeeding = 0;
         _testOutputHelper.WriteLine($"Expected food after feeding: {expectedFoodAfterFeeding}");
+        var expectedDaysGone = 40;
+        _testOutputHelper.WriteLine($"Expected days passed by: {expectedDaysGone}");
         var expectedHungryWorkers = 0; // They don't feel hunger anymore …
         _testOutputHelper.WriteLine($"Expected hungry workers: {expectedHungryWorkers}");
         var expectedDaysHungry = 0; // They don't feel hunger anymore …
@@ -264,7 +266,7 @@ public class VillageTest : IClassFixture<VillageFixture>
         _testOutputHelper.WriteLine($"Actual food before feeding: {actualFoodBeforeFeeding}");
 
         // 40 days passing by.
-        for (int i = 0; i < 40; i++)
+        for (int i = 0; i < expectedDaysGone; i++)
         {
             village.Day();
         }
@@ -272,24 +274,13 @@ public class VillageTest : IClassFixture<VillageFixture>
         var actualFoodAfterFeeding = village.GetFood();
         _testOutputHelper.WriteLine($"Actual food after feeding: {actualFoodAfterFeeding}");
         
+        var actualDaysGone = village.GetDaysGone();
+        _testOutputHelper.WriteLine($"Actual days passed by: {actualDaysGone}");
+        
         var actualDaysHungry = 0;
         List<Worker> actualHungryWorkers = new List<Worker>();
         List<Worker> actualAliveWorkers = new List<Worker>();
         
-        foreach (var worker in village.GetWorkers())
-        {
-            actualDaysHungry += worker.DaysHungry;
-        }
-        _testOutputHelper.WriteLine($"Actual days hungry: {actualDaysHungry}");
-        
-        foreach (var worker in village.GetWorkers())
-        {
-            if (worker.Alive == true)
-            {
-                actualAliveWorkers.Add(worker);
-            }
-        }
-
         foreach (var worker in village.GetWorkers())
         {
             if (worker.Hungry == true)
@@ -301,6 +292,20 @@ public class VillageTest : IClassFixture<VillageFixture>
         var actualHungryWorkersCount = actualHungryWorkers.Count;
         _testOutputHelper.WriteLine($"Actual hungry workers: {actualHungryWorkersCount}");
         
+        foreach (var worker in village.GetWorkers())
+        {
+            actualDaysHungry += worker.DaysHungry;
+        }
+        _testOutputHelper.WriteLine($"Actual days hungry: {actualDaysHungry}");
+
+        foreach (var worker in village.GetWorkers())
+        {
+            if (worker.Alive == true)
+            {
+                actualAliveWorkers.Add(worker);
+            }
+        }
+
         var actualAliveWorkersCount = actualAliveWorkers.Count;
         _testOutputHelper.WriteLine($"Actual workers alive: {actualAliveWorkersCount}");
 
@@ -316,13 +321,13 @@ public class VillageTest : IClassFixture<VillageFixture>
         Assert.Equal(expectedGameOver, actualGameOver);
     }
     [Fact]
-    public void Feed5WorkersWith0StartFoodFor39DaysGives5HungryWorkers39DaysHungryAndAllWorkerIsAliveThusItsNotGameOver()
+    public void Feed5WorkersWith0StartFoodFor39DaysGives5HungryWorkers39DaysHungry39DaysGoneAndAllWorkerIsAliveThusItsNotGameOver()
     {
         //Arrange
         
         // Add the village and the workers.
         Village village = _villageFixture.Village;
-        village.AddWorker("Sven the Farmer", () => village.AddFood(5));
+        village.AddWorker("Sven the Lumberjack", () => village.AddWood(1));
         village.AddWorker("Bob the Quarry Man", () => village.AddMetal(1));
         village.AddWorker("Olof the Lumberjack", () => village.AddWood(1));
         village.AddWorker("Olof II the Lumberjack", () => village.AddWood(1));
@@ -339,7 +344,9 @@ public class VillageTest : IClassFixture<VillageFixture>
         _testOutputHelper.WriteLine($"Expected food after feeding: {expectedFoodAfterFeeding}");
         var expectedHungryWorkers = 5;
         _testOutputHelper.WriteLine($"Expected hungry workers: {expectedHungryWorkers}");
-        var expectedDaysHungry = 39;
+        var expectedDaysGone = 39;
+        _testOutputHelper.WriteLine($"Expected days passed by: {expectedDaysGone}");
+        var expectedDaysHungry = expectedDaysGone * village.GetWorkers().Count; // 39 days for each worker.
         _testOutputHelper.WriteLine($"Expected days hungry: {expectedDaysHungry}");
         var expectedAliveWorkers = 5;
         _testOutputHelper.WriteLine($"Expected workers alive: {expectedAliveWorkers}");
@@ -352,14 +359,17 @@ public class VillageTest : IClassFixture<VillageFixture>
         var actualFoodBeforeFeeding = village.GetFood();
         _testOutputHelper.WriteLine($"Actual food before feeding: {actualFoodBeforeFeeding}");
 
-        // 40 days passing by.
-        for (int i = 0; i < 39; i++)
+        // 39 days passing by.
+        for (int i = 0; i < expectedDaysGone; i++)
         {
             village.Day();
         }
         
         var actualFoodAfterFeeding = village.GetFood();
         _testOutputHelper.WriteLine($"Actual food after feeding: {actualFoodAfterFeeding}");
+
+        var actualDaysGone = village.GetDaysGone();
+        _testOutputHelper.WriteLine($"Actual days passed by: {actualDaysGone}");
         
         var actualDaysHungry = 0;
         List<Worker> actualHungryWorkers = new List<Worker>();
@@ -405,35 +415,36 @@ public class VillageTest : IClassFixture<VillageFixture>
         Assert.Equal(expectedGameOver, actualGameOver);
     }
         [Fact]
-    public void Feed5WorkersWith2StartFoodFor40DaysGives3HungryWorkers40DaysHungryAnd3WorkerIsAliveThusItsNotGameOver()
+    public void Feed5WorkersWith2StartFoodFor40DaysGives2HungryWorkers39DaysHungryPerWorkerAnd2WorkerIsAliveThusItsNotGameOver()
     {
         //Arrange
         
         // Add the village and the workers.
         Village village = _villageFixture.Village;
-        village.AddWorker("Sven the Farmer", () => village.AddFood(5));
+        village.AddWorker("Sven the Lumberjack", () => village.AddWood(1));
         village.AddWorker("Bob the Quarry Man", () => village.AddMetal(1));
         village.AddWorker("Olof the Lumberjack", () => village.AddWood(1));
         village.AddWorker("Olof II the Lumberjack", () => village.AddWood(1));
         village.AddWorker("Daisy the Builder", () => village.AddProject(Building.Type.House));
         
-        // Deplete the village of all food before the test begins.
+        // Deplete the village of all food but 2 before the test begins.
         village.AddFood(1);
         village.AddFood(1);
         village.FeedWorkers(1);
         village.FeedWorkers(1);
-        
         
         var expectedFoodBeforeFeeding = 2;
         _testOutputHelper.WriteLine($"Expected food before feeding: {expectedFoodBeforeFeeding}");
         var expectedFoodAfterFeeding = 0;
         _testOutputHelper.WriteLine($"Expected food after feeding: {expectedFoodAfterFeeding}");
-        var expectedHungryWorkers = 3;
-        _testOutputHelper.WriteLine($"Expected hungry workers: {expectedHungryWorkers}");
-        var expectedDaysHungry = 39;
-        _testOutputHelper.WriteLine($"Expected days hungry: {expectedDaysHungry}");
-        var expectedAliveWorkers = 3;
+        var expectedDaysGone = 40;
+        _testOutputHelper.WriteLine($"Expected days passed by: {expectedDaysGone}");
+        var expectedAliveWorkers = 2;
         _testOutputHelper.WriteLine($"Expected workers alive: {expectedAliveWorkers}");
+        var expectedHungryWorkers = expectedAliveWorkers; // As many as expected to be alive.
+        _testOutputHelper.WriteLine($"Expected hungry workers: {expectedHungryWorkers}");
+        var expectedDaysHungry = (expectedDaysGone - 1) * expectedAliveWorkers; // 39 days for each worker expected to be alive.
+        _testOutputHelper.WriteLine($"Expected days hungry: {expectedDaysHungry}");
         var expectedGameOver = false;
         _testOutputHelper.WriteLine($"Expected Game Over: {expectedGameOver}");
 
@@ -444,7 +455,7 @@ public class VillageTest : IClassFixture<VillageFixture>
         _testOutputHelper.WriteLine($"Actual food before feeding: {actualFoodBeforeFeeding}");
 
         // 40 days passing by.
-        for (int i = 0; i < 40; i++)
+        for (int i = 0; i < expectedDaysGone; i++)
         {
             village.Day();
         }
@@ -452,16 +463,10 @@ public class VillageTest : IClassFixture<VillageFixture>
         var actualFoodAfterFeeding = village.GetFood();
         _testOutputHelper.WriteLine($"Actual food after feeding: {actualFoodAfterFeeding}");
         
-        var actualDaysHungry = 0;
-        List<Worker> actualHungryWorkers = new List<Worker>();
+        var actualDaysGone = village.GetDaysGone();
+        _testOutputHelper.WriteLine($"Actual days passed by: {actualDaysGone}");
+        
         List<Worker> actualAliveWorkers = new List<Worker>();
-        
-        foreach (var worker in village.GetWorkers())
-        {
-            actualDaysHungry += worker.DaysHungry;
-        }
-        _testOutputHelper.WriteLine($"Actual days hungry: {actualDaysHungry}");
-        
         foreach (var worker in village.GetWorkers())
         {
             if (worker.Alive == true)
@@ -469,7 +474,13 @@ public class VillageTest : IClassFixture<VillageFixture>
                 actualAliveWorkers.Add(worker);
             }
         }
-
+        
+        var actualAliveWorkersCount = actualAliveWorkers.Count;
+        _testOutputHelper.WriteLine($"Actual workers alive: {actualAliveWorkersCount}");
+        
+        var actualDaysHungry = 0;
+        List<Worker> actualHungryWorkers = new List<Worker>();
+        
         foreach (var worker in village.GetWorkers())
         {
             if (worker.Hungry == true)
@@ -481,8 +492,11 @@ public class VillageTest : IClassFixture<VillageFixture>
         var actualHungryWorkersCount = actualHungryWorkers.Count;
         _testOutputHelper.WriteLine($"Actual hungry workers: {actualHungryWorkersCount}");
         
-        var actualAliveWorkersCount = actualAliveWorkers.Count;
-        _testOutputHelper.WriteLine($"Actual workers alive: {actualAliveWorkersCount}");
+        foreach (var worker in village.GetWorkers())
+        {
+            actualDaysHungry += worker.DaysHungry;
+        }
+        _testOutputHelper.WriteLine($"Actual days hungry: {actualDaysHungry}");
 
         var actualGameOver = village.GameOver;
         _testOutputHelper.WriteLine($"Actual Game Over: {actualGameOver}");
@@ -494,6 +508,40 @@ public class VillageTest : IClassFixture<VillageFixture>
         Assert.Equal(expectedDaysHungry, actualDaysHungry);
         Assert.Equal(expectedAliveWorkers, actualAliveWorkersCount);
         Assert.Equal(expectedGameOver, actualGameOver);
+    }
+        [Fact]
+    public void OneDayOneFarmerGives14FoodAtTheEndOfDay()
+    {
+        //Arrange
+        
+        // Add the village and the workers.
+        Village village = _villageFixture.Village;
+        village.AddWorker("Sven the Farmer", () => village.AddFood(5));
+
+        // One farmer brings in 5 food and eats 1 food. The village starts with 10 food. Therefore, the village should have 14 food after one day.
+        var expectedFoodAtTheEndOfDay = 14;
+        _testOutputHelper.WriteLine($"Expected food at the end of day: {expectedFoodAtTheEndOfDay}");
+        var expectedDaysGone = 1;
+        _testOutputHelper.WriteLine($"Expected days passed by: {expectedDaysGone}");
+
+        _testOutputHelper.WriteLine("");
+        
+        //Act
+        // 1 day passing by.
+        for (int i = 0; i < expectedDaysGone; i++)
+        {
+            village.Day();
+        }
+        
+        var actualFoodAtTheEndOfDay = village.GetFood();
+        _testOutputHelper.WriteLine($"Actual food at the end of day: {actualFoodAtTheEndOfDay}");
+        
+        var actualDaysGone = village.GetDaysGone();
+        _testOutputHelper.WriteLine($"Actual days passed by: {actualDaysGone}");
+
+        //Assert
+        Assert.Equal(expectedFoodAtTheEndOfDay, actualFoodAtTheEndOfDay);
+        Assert.Equal(expectedDaysGone, actualDaysGone);
     }
     
     [Fact]

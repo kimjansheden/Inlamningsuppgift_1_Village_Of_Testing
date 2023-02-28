@@ -37,25 +37,20 @@ public class Village
     
     public void Day()
     {
-        do
+        for (var i = 0; i < _workers.Count; i++)
         {
-            for (var i = 0; i < _workers.Count; i++)
+            var worker = _workers[i];
+            // Make the workers do the day's work. Only if they're not hungry, though.
+            if (!worker.Hungry && worker.Alive)
             {
-                var worker = _workers[i];
-                // Make the workers do the day's work. Only if they're not hungry, though.
-                if (!worker.Hungry && worker.Alive)
-                {
-                    worker.DoWork();
-                }
-
-                // Make the workers eat the amount each day.
-                FeedWorkers(1);
+                worker.DoWork();
             }
-
-            _daysGone += 1;
-            
-            // If we get Game Over after the day's events, the game ends.
-        } while (!_gameOver);
+        }
+        // Make the workers eat the amount each day.
+        FeedWorkers(1);
+        
+        // A day goes by.
+        _daysGone += 1;
     }
 
     public void AddFood(int amount)
@@ -109,17 +104,11 @@ public class Village
             _maxWorkers += 2;
         }
     }
-    public void BuryDead()
-    {
-        for (var i = 0; i < _workers.Count; i++)
-        {
-            var worker = _workers[i];
-            if (!worker.Alive)
-            {
-                _workers.Remove(worker);
-            }
-        }
 
+    private void BuryDead(Worker worker)
+    {
+        _workers.Remove(worker);
+        
         // If all workers of the village are dead and buried, the game is over.
         if (_workers.Count != 0) return;
         _gameOver = true;
@@ -149,7 +138,14 @@ public class Village
                 if (worker.DaysHungry == 40)
                 {
                     worker.Alive = false;
-                    BuryDead();
+                    BuryDead(worker);
+                    
+                    // When a worker is removed from the list,
+                    // the size of the list decreases by 1.
+                    // Thus the counter also needs to be decremented
+                    // by 1. Otherwise the loop will skip the next
+                    // worker in the list.
+                    i--;
                 }
             }
         }
