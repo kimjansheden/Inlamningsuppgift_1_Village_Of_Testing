@@ -14,25 +14,30 @@ public class Village
     private int _woodPerDay = 0;
     private List<Worker> _workers = new List<Worker>();
     private bool _gameOver = false;
+    private bool _gameWon;
     private int _maxWorkers = 0;
 
     private readonly IUI _ui;
-    
-    private readonly Strings _strings = new Strings();
-    
+
+    private readonly Strings _strings;
+
     public bool GameOver => _gameOver;
+    public bool GameWon => _gameWon;
 
     public int FoodPerDay => _foodPerDay;
+    
+    public event EventHandler DaysGoneUpdated;
 
     public Village(IUI ui)
     {
-        // Initialize the UI
+        // Initialize the UI and the Strings
         _ui = ui;
+        _strings = new Strings(this);
 
         // A new village starts with three houses.
         for (int i = 0; i < 3; i++)
         {
-            AddBuilding((new Building(Building.Type.House, this)));
+            BuildingCompleted((new Building(Building.Type.House, this)));
             
             // The 3 houses come for free, so we must give the wood back that they cost.
             AddWood(5);
@@ -41,6 +46,10 @@ public class Village
     
     public void Day()
     {
+        // A day goes by.
+        _daysGone += 1;
+        DaysGoneUpdated?.Invoke(this, EventArgs.Empty);
+        
         for (var i = 0; i < _workers.Count; i++)
         {
             var worker = _workers[i];
@@ -52,12 +61,9 @@ public class Village
         }
         // Make the workers eat the amount each day.
         FeedWorkers(1);
-        
-        // A day goes by.
-        _daysGone += 1;
     }
 
-    private void AddBuilding(Building project)
+    private void BuildingCompleted(Building project)
     {
         _projects.Remove(project);
         _buildings.Add(project);
@@ -86,7 +92,8 @@ public class Village
     }
     public void AddCastle()
     {
-        
+        _ui.WriteLine(_strings.Messages[GameIsWon]);
+        _gameWon = true;
     }
     public void AddFarmer()
     {
@@ -124,9 +131,16 @@ public class Village
     {
         _metal -= amount;
     }
-    public void AddProject(Building.Type type)
+    public bool AddProject(Building.Type type)
     {
+        // Here we need to check the costs of the building type against what resources we have in the village, before we create a building object.
+        if (_wood < Building.GetCosts(type).costWood || _metal < Building.GetCosts(type).costMetal)
+        {
+            _ui.WriteLine(_strings.Messages[BuildNotEnoughResources]);
+            return false;
+        }
         _projects.Add(new Building(type, this));
+        return true;
     }
     public void AddWood()
     {
@@ -162,10 +176,12 @@ public class Village
             _ui.WriteLine(_strings.Messages[BuildNoProjects]);
             return;
         }
+        
+        // Work on the project at the top of the list.
         var project = _projects[0];
         project.WorkOn();
 
-        if (project.IsComplete) AddBuilding(project);
+        if (project.IsComplete) BuildingCompleted(project);
     }
 
     private void BuryDead(Worker worker)
@@ -213,7 +229,7 @@ public class Village
     }
     public int GetDaysGone()
     {
-        return this._daysGone;
+        return _daysGone;
     }
     public int GetFoodPerDay()
     {

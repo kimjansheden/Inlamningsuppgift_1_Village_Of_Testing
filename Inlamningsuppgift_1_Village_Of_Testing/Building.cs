@@ -2,13 +2,13 @@ namespace Inlamningsuppgift_1_Village_Of_Testing;
 
 public class Building
 {
-    private int _costMetal;
-    private int _costWood;
-    private int _daysToComplete;
+    private readonly int _costMetal;
+    private readonly int _costWood;
+    private readonly int _daysToComplete;
     private int _daysSpent;
     private bool _isComplete;
     private Type _type;
-    private Action<Village> _buildAction;
+    private readonly Action<Village> _buildAction;
     public Action<Village> BuildAction => _buildAction;
 
     public Type BuildingType
@@ -32,21 +32,23 @@ public class Building
     // returnerar en tupel med tre ints.
     // private delegate (int, int, int) ResourcesCost(Building building);
     
-    private Dictionary<Type, Func<Building, (int, int, int, Action<Village> action)>> _buildingTypeProperties =
-        new Dictionary<Type, Func<Building, (int, int, int, Action<Village> action)>>()
+    private static readonly Dictionary<Type, (int costWood, int costMetal, int daysToComplete, Action<Village> action)> BuildingTypeProperties =
+        new Dictionary<Type, (int costWood, int costMetal, int daysToComplete, Action<Village> action)>()
         {
-            { Type.House, b => (5, 0, 3, village => village.AddHouse()) },
-            { Type.Woodmill, b => (5, 1, 5, village => village.AddWoodmill()) },
-            { Type.Quarry, b => (3, 5, 7, village => village.AddQuarry()) },
-            { Type.Farm, b => (5, 2, 5, village => village.AddFarm()) },
-            { Type.Castle, b => (50, 50, 50, village => village.AddCastle()) },
+            { Type.House, (5, 0, 3, village => village.AddHouse()) },
+            { Type.Woodmill, (5, 1, 5, village => village.AddWoodmill()) },
+            { Type.Quarry, (3, 5, 7, village => village.AddQuarry()) },
+            { Type.Farm, (5, 2, 5, village => village.AddFarm()) },
+            { Type.Castle, (50, 50, 50, village => village.AddCastle()) }
         };
     
     public Building(Type type, Village village)
     {
-        _buildingTypeProperties.TryGetValue(type, out var typeProperties);
-        (_costWood, _costMetal, _daysToComplete, _buildAction) = typeProperties!(this);
+        BuildingTypeProperties.TryGetValue(type, out var typeProperties);
+        (_costWood, _costMetal, _daysToComplete, _buildAction) = typeProperties;
         BuildingType = type;
+        
+        // The costs are deducted from the village's resources when the building is added to the list of projects.
         village.RemoveWood(_costWood);
         village.RemoveMetal(_costMetal);
     }
@@ -63,17 +65,12 @@ public class Building
     {
         return _costMetal;
     }
-    public void AddFood()
-    {
 
-    }
-    public void AddMetal()
+    public static (int costWood, int costMetal) GetCosts(Type type)
     {
-
-    }
-    public void AddWood()
-    {
-
+        BuildingTypeProperties.TryGetValue(type, out var typeProperties);
+        (var costWood, var costMetal, _, _) = typeProperties;
+        return (costWood, costMetal);
     }
     public void WorkOn()
     {
