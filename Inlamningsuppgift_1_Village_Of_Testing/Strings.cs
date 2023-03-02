@@ -6,6 +6,7 @@ public class Strings
     public enum Message
     {
         AddWorkerNoName,
+        AddWorkerNoRoom,
         MenuEnterValidNumber,
         Menu,
         BuildNoProjects,
@@ -38,6 +39,9 @@ public class Strings
         {
             {
                 Message.AddWorkerNoName, "Please enter a name for the worker."
+            },
+            {
+                Message.AddWorkerNoRoom, "The maximum number of workers that can live in the village is reached. No new workers can live in the village until more houses are built."
             },
             {
                 Message.MenuEnterValidNumber, "Please enter a valid option."

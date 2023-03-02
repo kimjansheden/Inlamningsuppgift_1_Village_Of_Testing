@@ -154,20 +154,25 @@ public class Village
     {
         _wood -= amount;
     }
-    public void AddWorker(string name, Worker.Type job, Worker.WorkDelegate workDelegate)
+    public bool AddWorker(string name, Worker.Type job, Worker.WorkDelegate workDelegate)
     {
-        if (!string.IsNullOrEmpty(name))
-        {
-            Worker worker = new Worker(name, job, workDelegate);
-            _workers.Add(worker);
-            worker.JobAction.Invoke(this);
-        }
-        else
+        if (string.IsNullOrEmpty(name))
         {
             _ui.WriteLine(_strings.Messages[AddWorkerNoName]);
-            // _ui.WriteLine(Strings.MessagesAddWorkerNoName);
+            return false;
         }
         
+        // If the number of workers in the village is equal to the maximum workers allowed, then the max is reached and no new workers can live in the village until more houses are built.
+        if (_workers.Count == _maxWorkers)
+        {
+            _ui.WriteLine(_strings.Messages[AddWorkerNoRoom]);
+            return false;
+        }
+
+        Worker worker = new Worker(name, job, workDelegate);
+        _workers.Add(worker);
+        worker.JobAction.Invoke(this);
+        return true;
     }
     public void Build()
     {
