@@ -178,7 +178,7 @@ public class Village
     {
         if (_projects.Count == 0)
         {
-            _ui.WriteLine(_strings.Messages[BuildNoProjects]);
+            //_ui.WriteLine(_strings.Messages[BuildNoProjects]);
             return;
         }
         
@@ -276,6 +276,44 @@ public class Village
     public List<Building> GetBuildings()
     {
         return this._buildings;
+    }
+
+    public string GetStats()
+    {
+        return $"Day: {_daysGone + 1}.\n" +
+               $"Food: {_food}.\n" +
+               $"Metal: {_metal}.\n" +
+               $"Wood: {_wood}.\n" +
+               $"\n" +
+               $"Food Per Day: {_foodPerDay}.\n" +
+               $"Metal Per Day: {_metalPerDay}.\n" +
+               $"Wood Per Day: {_woodPerDay}.\n" +
+               $"\n" +
+               $"~*~*~WORKERS~*~*~\n" +
+               $"\n" +
+               $"Total Workers: {_workers.Count}/{_maxWorkers}.\n" +
+               $"Farmers: {_workers.Count(w => w.Job == Worker.Type.Farmer)}.\n" +
+               $"Quarry Workers: {_workers.Count(w => w.Job == Worker.Type.QuarryWorker)}.\n" +
+               $"Lumberjacks: {_workers.Count(w => w.Job == Worker.Type.Lumberjack)}.\n" +
+               $"Builders: {_workers.Count(w => w.Job == Worker.Type.Builder)}.\n" +
+               $"\n" +
+               $"~*~*~PROJECTS~*~*~\n" +
+               $"\n" +
+               $"Total Projects: {_projects.Count}\n" +
+               $"Houses: {_projects.Count(p => p.BuildingType == Building.Type.House)}\n" +
+               $"Farms: {_projects.Count(p => p.BuildingType == Building.Type.Farm)}\n" +
+               $"Woodmills: {_projects.Count(p => p.BuildingType == Building.Type.Woodmill)}\n" +
+               $"Quarries: {_projects.Count(p => p.BuildingType == Building.Type.Quarry)}\n" +
+               $"Castle: {_projects.Count(p => p.BuildingType == Building.Type.Castle)}\n" +
+               $"\n" +
+               $"~*~*~BUILDINGS~*~*~\n" +
+               $"\n" +
+               $"Total Buildings: {_buildings.Count}\n" +
+               $"Houses: {_buildings.Count(b => b.BuildingType == Building.Type.House)}\n" +
+               $"Farms: {_buildings.Count(b => b.BuildingType == Building.Type.Farm)}\n" +
+               $"Woodmills: {_buildings.Count(b => b.BuildingType == Building.Type.Woodmill)}\n" +
+               $"Quarries: {_buildings.Count(b => b.BuildingType == Building.Type.Quarry)}\n" +
+               $"Castle: {_buildings.Count(b => b.BuildingType == Building.Type.Castle)}";
     }
     
 }

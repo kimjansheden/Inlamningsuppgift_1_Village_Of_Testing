@@ -11,4 +11,9 @@ public class ConsoleUI : IUI
     {
         return Console.ReadLine() ?? string.Empty;
     }
+
+    public void Clear()
+    {
+        Console.Clear();
+    }
 }
