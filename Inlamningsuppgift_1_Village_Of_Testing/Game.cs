@@ -24,43 +24,67 @@ public class Game
     }
     public void Run()
     {
-        while (!_village.GameOver || !_village.GameWon)
-        {
-            Menu();
-        }
+        _ui.Clear(); //To start the console application without the extra output in the beginning (file path, exit code)
+        Menu();
     }
 
     public void Menu()
     {
-        _ui.WriteLine(_strings.Messages[MenuStart]);
-        var input = _ui.ReadLine();
-        _ui.Clear();
-        switch(input)
+        while (!_village.GameOver || !_village.GameWon)
         {
-            case "1":
-                _ui.Clear();
-                Console.Clear();
-                _ui.WriteLine(_village.GetStats());
-                break;
-            case "2":
-                _ui.Clear();
-                AddWorkerInput();
-                break;
-            case "3":
-                _ui.Clear();
-                AddProjectInput();
-                break;
-            case "4":
-                _ui.Clear();
-                _village.Day();
-                _ui.WriteLine(_strings.Messages[MenuDay]);
-                break;
-            case "5":
-                return;
-            default:
-                _ui.Clear();
-                _ui.WriteLine(_strings.Messages[MenuEnterValidNumber]);
-                break;
+            _ui.WriteLine(_strings.Messages[MenuStart]);
+            var input = _ui.ReadLine();
+            _ui.Clear();
+            switch(input)
+            {
+                case "1":
+                    _ui.Clear();
+                    _ui.WriteLine(_village.GetStats());
+                    break;
+                case "2":
+                    _ui.Clear();
+                    AddWorkerInput();
+                    break;
+                case "3":
+                    _ui.Clear();
+                    BanishWorkerInput();
+                    break;
+                case "4":
+                    _ui.Clear();
+                    AddProjectInput();
+                    break;
+                case "5":
+                    _ui.Clear();
+                    _village.Day();
+                    _ui.WriteLine(_strings.Messages[MenuDay]);
+                    break;
+                case "6":
+                    _ui.Clear();
+                    _ui.WriteLine(_strings.Messages[MenuQuit]);
+                    return;
+                default:
+                    _ui.Clear();
+                    _ui.WriteLine(_strings.Messages[MenuEnterValidNumber]);
+                    break;
+            }
+        }
+    }
+
+    private void BanishWorkerInput()
+    {
+        _ui.WriteLine(_strings.Messages[MenuBanishWorker]);
+        _ui.WriteLine(_strings.Messages[MenuBanishWorkerWorkerStats]);
+        var workerNumberSuccess = int.TryParse(_ui.ReadLine(), out  int workerNumber);
+        if (!workerNumberSuccess)
+        {
+            _ui.WriteLine(_strings.Messages[MenuEnterValidNumber]);
+        }
+        for (int i = 1; i < _village.GetWorkers().Count + 1; i++)
+        {
+            if (workerNumber == i)
+            {
+                _village.Banish(_village.GetWorkers()[i - 1]); 
+            }
         }
     }
 

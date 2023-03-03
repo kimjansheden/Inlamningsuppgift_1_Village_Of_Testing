@@ -3,19 +3,31 @@ using static Inlamningsuppgift_1_Village_Of_Testing.Strings.Message;
 namespace Inlamningsuppgift_1_Village_Of_Testing;
 public class Village
 {
-    private List<Building> _buildings = new List<Building>();
     private int _daysGone = 0;
     private int _food = 10; //Village starts with 10 food.
     private int _foodPerDay = 0;
+    private int _foodPerDayBonus = 0;
     private int _metal = 0;
     private int _metalPerDay = 0;
-    private List<Building> _projects = new List<Building>();
+    private int _metalPerDayBonus = 0;
     private int _wood = 0;
     private int _woodPerDay = 0;
+    private int _woodPerDayBonus = 0;
+    private List<Building> _buildings = new List<Building>();
+    private List<Building> _projects = new List<Building>();
     private List<Worker> _workers = new List<Worker>();
     private bool _gameOver = false;
     private bool _gameWon;
     private int _maxWorkers = 0;
+    private int _farmers = 0;
+    private int _lumberjacks = 0;
+    private int _quarryworkers = 0;
+    private int _builders = 0;
+    private int _farms = 0;
+    private int _woodmills = 0;
+    private int _quarries = 0;
+    private int _houses = 0;
+    private bool _starvation = false;
 
     private readonly IUI _ui;
 
@@ -26,7 +38,7 @@ public class Village
 
     public int FoodPerDay => _foodPerDay;
     
-    public event EventHandler DaysGoneUpdated;
+    public event EventHandler VillageUpdated;
 
     public Village(IUI ui)
     {
@@ -48,7 +60,7 @@ public class Village
     {
         // A day goes by.
         _daysGone += 1;
-        DaysGoneUpdated?.Invoke(this, EventArgs.Empty);
+        VillageUpdated?.Invoke(this, EventArgs.Empty);
         
         for (var i = 0; i < _workers.Count; i++)
         {
@@ -61,9 +73,22 @@ public class Village
         }
         // Make the workers eat the amount each day.
         FeedWorkers(1);
+        
+        // Update the current workers.
+        _farmers = _workers.Count(w => w.Job == Worker.Type.Farmer);
+        _lumberjacks = _workers.Count(w => w.Job == Worker.Type.Lumberjack);
+        _quarryworkers = _workers.Count(w => w.Job == Worker.Type.QuarryWorker);
+        _builders = _workers.Count(w => w.Job == Worker.Type.Builder);
+        
+        // Get the current resource income.
+        _foodPerDay = (_farmers * 5) + (_foodPerDayBonus * _farmers);
+        _woodPerDay = _lumberjacks + (_woodPerDayBonus * _lumberjacks);
+        _metalPerDay = _quarryworkers + (_metalPerDayBonus * _quarryworkers);
+        
+        // Update the current buildings.
     }
 
-    private void BuildingCompleted(Building project)
+    public void BuildingCompleted(Building project)
     {
         _projects.Remove(project);
         _buildings.Add(project);
@@ -76,19 +101,29 @@ public class Village
     {
         // For every house that exists in the village, allow 2 workers to live in the village.
         _maxWorkers += 2;
+        _houses += 1;
     }
 
     public void AddWoodmill()
     {
-        _woodPerDay += 2;
+        if (_lumberjacks > 0) _woodPerDay += 2 * _lumberjacks;
+        else _woodPerDay += 2;
+        _woodPerDayBonus += 2;
+        _woodmills += 1;
     }
     public void AddQuarry()
     {
-        _metalPerDay += 2;
+        if (_quarryworkers > 0) _metalPerDay += 2 * _quarryworkers;
+        else _metalPerDay += 2;
+        _metalPerDayBonus += 2;
+        _quarries += 1;
     }
     public void AddFarm()
     {
-        _foodPerDay += 10;
+        if (_farmers > 0) _foodPerDay += 10 * _farmers;
+        else _foodPerDay += 10;
+        _foodPerDayBonus += 10;
+        _farms += 1;
     }
     public void AddCastle()
     {
@@ -97,23 +132,29 @@ public class Village
     }
     public void AddFarmer()
     {
-        _foodPerDay += 5;
+        if (_farms > 0) _foodPerDay += 5 + _foodPerDayBonus;
+        else _foodPerDay += 5;
+        _farmers += 1;
     }
     public void AddLumberjack()
     {
-        _woodPerDay += 1;
+        if (_woodmills > 0) _woodPerDay += 1 + _woodPerDayBonus;
+        else _woodPerDay += 1;
+        _lumberjacks += 1;
     }
     public void AddQuarryWorker()
     {
-        _metalPerDay += 1;
+        if (_quarries > 0) _metalPerDay += 1 + _metalPerDayBonus;
+        else _metalPerDay += 1;
+        _quarryworkers += 1;
     }
     public void AddBuilder()
     {
-        
+        _builders += 1;
     }
     public void AddFood()
     {
-        _food += FoodPerDay;
+        _food += 5 + _foodPerDayBonus;
     }
     public void AddFood(int amount)
     {
@@ -121,7 +162,7 @@ public class Village
     }
     public void AddMetal()
     {
-        _metal += _metalPerDay;
+        _metal += 1 + _metalPerDayBonus;
     }
     public void AddMetal(int amount)
     {
@@ -144,7 +185,7 @@ public class Village
     }
     public void AddWood()
     {
-        _wood += _woodPerDay;
+        _wood += 1 + _woodPerDayBonus;
     }
     public void AddWood(int amount)
     {
@@ -154,24 +195,53 @@ public class Village
     {
         _wood -= amount;
     }
+
+    private void RemoveWorker(Worker worker)
+    {
+        var job = worker.Job;
+        switch (job)
+        {
+            case Worker.Type.Builder:
+                _builders -= 1;
+                break;
+            case Worker.Type.Farmer:
+                if (_farms > 0) _foodPerDay -= 5 + _foodPerDayBonus;
+                else _foodPerDay -= 5;
+                _farmers -= 1;
+                break;
+            case Worker.Type.Lumberjack:
+                if (_woodmills > 0) _woodPerDay -= 1 + _woodPerDayBonus;
+                else _woodPerDay -= 1;
+                _lumberjacks -= 1;
+                break;
+            case Worker.Type.QuarryWorker:
+                if (_quarries > 0) _metalPerDay -= 1 + _metalPerDayBonus;
+                else _metalPerDay -= 1;
+                _quarryworkers -= 1;
+                break;
+        }
+        _workers.Remove(worker);
+        VillageUpdated?.Invoke(this, EventArgs.Empty);
+    }
     public bool AddWorker(string name, Worker.Type job, Worker.WorkDelegate workDelegate)
     {
         if (string.IsNullOrEmpty(name))
         {
-            _ui.WriteLine(_strings.Messages[AddWorkerNoName]);
+            _ui.WriteLine(_strings.Messages[WorkerAddNoName]);
             return false;
         }
         
         // If the number of workers in the village is equal to the maximum workers allowed, then the max is reached and no new workers can live in the village until more houses are built.
         if (_workers.Count == _maxWorkers)
         {
-            _ui.WriteLine(_strings.Messages[AddWorkerNoRoom]);
+            _ui.WriteLine(_strings.Messages[WorkerAddNoRoom]);
             return false;
         }
 
         Worker worker = new Worker(name, job, workDelegate);
         _workers.Add(worker);
         worker.JobAction.Invoke(this);
+        VillageUpdated?.Invoke(this, EventArgs.Empty);
         return true;
     }
     public void Build()
@@ -189,9 +259,19 @@ public class Village
         if (project.IsComplete) BuildingCompleted(project);
     }
 
+    public void Banish(Worker worker)
+    {
+        if (worker.Hungry)
+        {
+            _ui.WriteLine(_strings.Messages[WorkerCantBanishStarving]);
+            return;
+        }
+        RemoveWorker(worker);
+        _ui.WriteLine(worker.Name + _strings.Messages[WorkerHasBeenBanished]);
+    }
     private void BuryDead(Worker worker)
     {
-        _workers.Remove(worker);
+        RemoveWorker(worker);
         
         // If all workers of the village are dead and buried, the game is over.
         if (_workers.Count != 0) return;
@@ -217,6 +297,7 @@ public class Village
             {
                 // The village has no food left, thus the worker gets hungry.
                 worker.Starve();
+                _starvation = true;
                 if (worker.DaysHungry == 40)
                 {
                     worker.Die();
@@ -278,42 +359,120 @@ public class Village
         return this._buildings;
     }
 
+    /// <summary>
+    /// Get the current state of the village.
+    /// </summary>
+    /// <param name="asString">Set true if you want the state returned as a string.</param>
+    /// <param name="asList">Set true if you want the state returned as a list.</param>
+    /// /// <param name="workers">Set true if you want the detailed state of the workers.</param>
+    /// <returns>The current state of the village as a string or a list.</returns>
+    /// <remarks>The parameters are optional; asString is default.</remarks>
+    // public List<object> GetStats<T>(bool asList = true)
+    // {
+    //     var workersList = new List<object>();
+    //     foreach (var worker in _workers)
+    //     {
+    //         workersList.Add(worker.Name);
+    //         workersList.Add(worker.DaysHungry);
+    //     }
+    // }
     public string GetStats()
     {
-        return $"Day: {_daysGone + 1}.\n" +
-               $"Food: {_food}.\n" +
-               $"Metal: {_metal}.\n" +
-               $"Wood: {_wood}.\n" +
-               $"\n" +
-               $"Food Per Day: {_foodPerDay}.\n" +
-               $"Metal Per Day: {_metalPerDay}.\n" +
-               $"Wood Per Day: {_woodPerDay}.\n" +
-               $"\n" +
-               $"~*~*~WORKERS~*~*~\n" +
-               $"\n" +
-               $"Total Workers: {_workers.Count}/{_maxWorkers}.\n" +
-               $"Farmers: {_workers.Count(w => w.Job == Worker.Type.Farmer)}.\n" +
-               $"Quarry Workers: {_workers.Count(w => w.Job == Worker.Type.QuarryWorker)}.\n" +
-               $"Lumberjacks: {_workers.Count(w => w.Job == Worker.Type.Lumberjack)}.\n" +
-               $"Builders: {_workers.Count(w => w.Job == Worker.Type.Builder)}.\n" +
-               $"\n" +
-               $"~*~*~PROJECTS~*~*~\n" +
-               $"\n" +
-               $"Total Projects: {_projects.Count}\n" +
-               $"Houses: {_projects.Count(p => p.BuildingType == Building.Type.House)}\n" +
-               $"Farms: {_projects.Count(p => p.BuildingType == Building.Type.Farm)}\n" +
-               $"Woodmills: {_projects.Count(p => p.BuildingType == Building.Type.Woodmill)}\n" +
-               $"Quarries: {_projects.Count(p => p.BuildingType == Building.Type.Quarry)}\n" +
-               $"Castle: {_projects.Count(p => p.BuildingType == Building.Type.Castle)}\n" +
-               $"\n" +
-               $"~*~*~BUILDINGS~*~*~\n" +
-               $"\n" +
-               $"Total Buildings: {_buildings.Count}\n" +
-               $"Houses: {_buildings.Count(b => b.BuildingType == Building.Type.House)}\n" +
-               $"Farms: {_buildings.Count(b => b.BuildingType == Building.Type.Farm)}\n" +
-               $"Woodmills: {_buildings.Count(b => b.BuildingType == Building.Type.Woodmill)}\n" +
-               $"Quarries: {_buildings.Count(b => b.BuildingType == Building.Type.Quarry)}\n" +
-               $"Castle: {_buildings.Count(b => b.BuildingType == Building.Type.Castle)}";
-    }
-    
+        var statsString = "";
+        if (_starvation)
+            statsString +=
+                "YOUR VILLAGE IS STARVING! You need to either banish a worker from your village, add a farmer or build more farms.\n";
+
+        statsString += $"Day: {_daysGone + 1}.\n\n" +
+                       $"Food: {_food}.\n" +
+                       $"Metal: {_metal}.\n" +
+                       $"Wood: {_wood}.\n" +
+                       $"\n" +
+                       $"Food Per Day: {_foodPerDay}.\n" +
+                       $"Metal Per Day: {_metalPerDay}.\n" +
+                       $"Wood Per Day: {_woodPerDay}.\n" +
+                       $"\n" +
+                       $"~*~*~WORKERS~*~*~\n" +
+                       $"\n" +
+                       $"Total Workers: {_workers.Count}/{_maxWorkers}.\n" +
+                       $"Farmers: {_farmers}.\n" +
+                       $"Quarry Workers: {_quarryworkers}.\n" +
+                       $"Lumberjacks: {_lumberjacks}.\n" +
+                       $"Builders: {_builders}.\n" +
+                       $"\n";
+
+        statsString += "~*~*~PROJECTS~*~*~\n" +
+                       $"\n" +
+                       $"Total Projects: {_projects.Count}\n" +
+                       $"Houses: {_projects.Count(p => p.BuildingType == Building.Type.House)}\n";
+        
+        var counter = 0;
+        foreach (var project in _projects)
+        {
+            if (project.BuildingType == Building.Type.House)
+            {
+                statsString += $"    House {counter += 1}: {project.DaysSpent}/{project.DaysToComplete} days worked on.\n";
+            }
+        }
+
+        statsString += 
+                        $"Farms: {_projects.Count(p => p.BuildingType == Building.Type.Farm)}\n";
+        
+        counter = 0;
+        foreach (var project in _projects)
+        {
+            if (project.BuildingType == Building.Type.Farm)
+            {
+                statsString += $"    Farm {counter += 1}: {project.DaysSpent}/{project.DaysToComplete} days worked on.\n";
+            }
+        }
+
+        statsString +=
+            $"Woodmills: {_projects.Count(p => p.BuildingType == Building.Type.Woodmill)}\n";
+        
+        counter = 0;
+        foreach (var project in _projects)
+        {
+            if (project.BuildingType == Building.Type.Woodmill)
+            {
+                statsString += $"    Woodmill {counter += 1}: {project.DaysSpent}/{project.DaysToComplete} days worked on.\n";
+            }
+        }
+
+        statsString +=
+            $"Quarries: {_projects.Count(p => p.BuildingType == Building.Type.Quarry)}\n";
+        
+        counter = 0;
+        foreach (var project in _projects)
+        {
+            if (project.BuildingType == Building.Type.Quarry)
+            {
+                statsString += $"    Quarry {counter += 1}: {project.DaysSpent}/{project.DaysToComplete} days worked on.\n";
+            }
+        }
+
+        statsString +=
+            $"Castle: {_projects.Count(p => p.BuildingType == Building.Type.Castle)}\n";
+        
+        counter = 0;
+        foreach (var project in _projects)
+        {
+            if (project.BuildingType == Building.Type.Castle)
+            {
+                statsString += $"    Castle: {project.DaysSpent}/{project.DaysToComplete} days worked on.\n";
+            }
+        }
+        
+        statsString +=
+                       $"\n" +
+                       $"~*~*~BUILDINGS~*~*~\n" +
+                       $"\n" +
+                       $"Total Buildings: {_buildings.Count}\n" +
+                       $"Houses: {_buildings.Count(b => b.BuildingType == Building.Type.House)}\n" +
+                       $"Farms: {_buildings.Count(b => b.BuildingType == Building.Type.Farm)}\n" +
+                       $"Woodmills: {_buildings.Count(b => b.BuildingType == Building.Type.Woodmill)}\n" +
+                       $"Quarries: {_buildings.Count(b => b.BuildingType == Building.Type.Quarry)}\n" +
+                       $"Castle: {_buildings.Count(b => b.BuildingType == Building.Type.Castle)}\n";
+        return statsString;
+        }
 }

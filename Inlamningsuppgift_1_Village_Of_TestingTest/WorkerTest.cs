@@ -110,7 +110,7 @@ public class WorkerTest : IClassFixture<VillageFixture>
         Strings strings = new Strings();
         var writer = new StringWriter();
         Console.SetOut(writer);
-        var expectedMessage = strings.Messages[AddWorkerNoName];
+        var expectedMessage = strings.Messages[WorkerAddNoName];
         village.AddWorker("", Worker.Type.Farmer, () => village.AddFood());
 
         //Act
@@ -141,7 +141,7 @@ public class WorkerTest : IClassFixture<VillageFixture>
         Strings strings = new Strings();
         var writer = new StringWriter();
         Console.SetOut(writer);
-        var expectedMessage = strings.Messages[AddWorkerNoRoom];
+        var expectedMessage = strings.Messages[WorkerAddNoRoom];
         _testOutputHelper.WriteLine($"Expected message: {expectedMessage}");
         
         _testOutputHelper.WriteLine("");

@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace Inlamningsuppgift_1_Village_Of_Testing;
 
 public class ConsoleUI : IUI
@@ -14,6 +16,14 @@ public class ConsoleUI : IUI
 
     public void Clear()
     {
-        Console.Clear();
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            Console.Clear();
+        }
+        else
+        {
+            Console.Clear();
+            Console.WriteLine("\x1b[3J");  
+        }
     }
 }

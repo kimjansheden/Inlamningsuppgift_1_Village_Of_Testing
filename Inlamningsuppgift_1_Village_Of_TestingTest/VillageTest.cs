@@ -112,17 +112,17 @@ public class VillageTest : IClassFixture<VillageFixture>
     {
         //Arrange
         Village village = _villageFixture.Village;
-        village.AddWorker("Sven the Lumberjack", Worker.Type.Lumberjack, () => village.AddFood());
+        village.AddWorker("Sven the Lumberjack", Worker.Type.Lumberjack, () => village.AddWood());
         village.AddWorker("Bob the Quarry Man", Worker.Type.QuarryWorker, () => village.AddMetal());
         village.AddWorker("Olof the Lumberjack", Worker.Type.Lumberjack, () => village.AddWood());
         village.AddWorker("Daisy the Builder", Worker.Type.Builder, () => village.AddProject(Building.Type.House));
 
         var expectedFoodBeforeDay = 10;
-        _testOutputHelper.WriteLine($"Expected food before feeding: {expectedFoodBeforeDay}");
+        _testOutputHelper.WriteLine($"Expected food before a day: {expectedFoodBeforeDay}");
         var expectedDaysGone = 1;
         _testOutputHelper.WriteLine($"Expected days gone: {expectedDaysGone}");
-        var expectedFoodAfterFeeding = expectedFoodBeforeDay - village.GetWorkers().Count;
-        _testOutputHelper.WriteLine($"Expected food after a day: {expectedFoodAfterFeeding}");
+        var expectedFoodAfterDay = expectedFoodBeforeDay - village.GetWorkers().Count;
+        _testOutputHelper.WriteLine($"Expected food after a day: {expectedFoodAfterDay}");
         var expectedHungryWorkers = 0;
         _testOutputHelper.WriteLine($"Expected hungry workers: {expectedHungryWorkers}");
         var expectedDaysHungry = 0;
@@ -134,15 +134,15 @@ public class VillageTest : IClassFixture<VillageFixture>
         
         //Act
         var actualFoodBeforeDay = village.GetFood();
-        _testOutputHelper.WriteLine($"Actual food before feeding: {actualFoodBeforeDay}");
+        _testOutputHelper.WriteLine($"Actual food before a day: {actualFoodBeforeDay}");
         
         village.Day();
 
         var actualDaysGone = village.GetDaysGone();
         _testOutputHelper.WriteLine($"Actual days gone: {actualDaysGone}");
 
-        var actualFoodAfterFeeding = village.GetFood();
-        _testOutputHelper.WriteLine($"Actual food after a day: {actualFoodAfterFeeding}");
+        var actualFoodAfterDay = village.GetFood();
+        _testOutputHelper.WriteLine($"Actual food after a day: {actualFoodAfterDay}");
         
         var actualDaysHungry = 0;
         List<Worker> actualHungryWorkers = new List<Worker>();
@@ -177,7 +177,7 @@ public class VillageTest : IClassFixture<VillageFixture>
 
         //Assert
         Assert.Equal(expectedFoodBeforeDay, actualFoodBeforeDay);
-        Assert.Equal(expectedFoodAfterFeeding, actualFoodAfterFeeding);
+        Assert.Equal(expectedFoodAfterDay, actualFoodAfterDay);
         Assert.Equal(expectedHungryWorkers, actualHungryWorkersCount);
         Assert.Equal(expectedDaysHungry, actualDaysHungry);
         Assert.Equal(expectedAliveWorkers, actualAliveWorkersCount);
@@ -953,7 +953,7 @@ public class VillageTest : IClassFixture<VillageFixture>
         Assert.Equal(expectedWoodAfterComplete, actualWoodAfterComplete);
     }
     [Fact]
-    public void BuildAQuarryCompleteAfter7DaysIncreasesMetalPerDayBy2DecreasesMetalBy5AndWoodBy3()
+    public void Build_A_Quarry_Complete_After_7_Days_Increases_Metal_Per_Day_By_2_Decreases_Metal_By_5_And_Wood_By_3()
     {
         //Arrange
         Village village = _villageFixture.Village;
@@ -1418,5 +1418,90 @@ public class VillageTest : IClassFixture<VillageFixture>
         Assert.Equal(expectedMessage, actualMessageCastle);
         Assert.Equal(expectedMessage, actualMessageQuarry);
         Assert.Equal(expectedMessage, actualMessageWoodmill);
+    }
+    [Fact]
+    public void A_Village_With_18_Wood_3_Lumberjacks_And_1_Woodmill_Should_Have_9_Wood_Per_Day_And_The_Next_Day_23_Wood()
+    {
+        //Arrange
+        Village village = _villageFixture.Village;
+        
+        // Setting up the starting conditions.
+        village.AddWorker("Leif", Worker.Type.Lumberjack, () => village.AddWood());
+        village.AddWorker("Leif II", Worker.Type.Lumberjack, () => village.AddWood());
+        village.AddWorker("Leif III", Worker.Type.Lumberjack, () => village.AddWood());
+        village.AddWorker("Leif IV", Worker.Type.Farmer, () => village.AddFood());
+        village.AddWorker("Leif V", Worker.Type.Builder, () => village.Build());
+        
+        village.BuildingCompleted(new Building(Building.Type.Woodmill, village));
+        // The woodmill comes for free in this test, so we must give the resources back that it cost.
+        village.AddWood(5);
+        village.AddMetal(1);
+        
+        // Now we add the condition we want to test.
+        village.AddWood(18);
+
+        var expectedWoodBeforeTheNextDay = 18; 
+        var expectedWoodPerDayBeforeTheNextDay = 9; 
+        var expectedWoodmills = 1;
+        
+        var expectedWoodAfterTheNextDay = expectedWoodBeforeTheNextDay + expectedWoodPerDayBeforeTheNextDay;
+
+        //Act
+        var actualWoodBeforeTheNextDay = village.GetWood(); 
+        var actualWoodPerDayBeforeTheNextDay = village.GetWoodPerDay(); 
+        var actualWoodmills = village.GetBuildings().Count(b => b.BuildingType == Building.Type.Woodmill);
+        
+        village.Day();
+        
+        var actualWoodAfterTheNextDay = village.GetWood();
+
+        //Assert
+        Assert.Equal(expectedWoodBeforeTheNextDay, actualWoodBeforeTheNextDay);
+        Assert.Equal(expectedWoodPerDayBeforeTheNextDay, actualWoodPerDayBeforeTheNextDay);
+        Assert.Equal(expectedWoodmills, actualWoodmills);
+        Assert.Equal(expectedWoodAfterTheNextDay, actualWoodAfterTheNextDay);
+    }
+    [Fact]
+    public void A_Village_With_3_Lumberjacks_And_1_Woodmill_That_Adds_a_New_Lumberjack_Should_Have_9_Wood_Per_Day_Before_And_12_Wood_Per_Day_After()
+    {
+        //Arrange
+        Village village = _villageFixture.Village;
+        
+        // Setting up the starting conditions.
+        village.AddWorker("Leif", Worker.Type.Lumberjack, () => village.AddWood());
+        village.AddWorker("Leif II", Worker.Type.Lumberjack, () => village.AddWood());
+        village.AddWorker("Leif III", Worker.Type.Lumberjack, () => village.AddWood());
+        village.AddWorker("Leif IV", Worker.Type.Farmer, () => village.AddFood());
+        village.AddWorker("Leif V", Worker.Type.Builder, () => village.Build());
+        
+        village.BuildingCompleted(new Building(Building.Type.Woodmill, village));
+        // The woodmill comes for free in this test, so we must give the resources back that it cost.
+        village.AddWood(5);
+        village.AddMetal(1);
+
+        var expectedLumberjacksBefore = 3;
+        var expectedWoodPerDayBefore = 9; 
+        
+        var expectedWoodmills = 1;
+
+        var expectedLumberjacksAfter = 4;
+        var expectedWoodPerDayAfter = 12;
+
+        //Act
+        var actualLumberjacksBefore = village.GetWorkers().Count(w => w.Job == Worker.Type.Lumberjack);
+        var actualWoodPerDayBefore = village.GetWoodPerDay(); 
+        var actualWoodmills = village.GetBuildings().Count(b => b.BuildingType == Building.Type.Woodmill);
+
+        village.AddWorker("Sven", Worker.Type.Lumberjack, () => village.AddWood());
+
+        var actualLumberjacksAfter = village.GetWorkers().Count(w => w.Job == Worker.Type.Lumberjack);
+        var actualWoodPerDayAfter = village.GetWoodPerDay();
+
+        //Assert
+        Assert.Equal(expectedLumberjacksBefore, actualLumberjacksBefore);
+        Assert.Equal(expectedWoodPerDayBefore, actualWoodPerDayBefore);
+        Assert.Equal(expectedWoodmills, actualWoodmills);
+        Assert.Equal(expectedLumberjacksAfter, actualLumberjacksAfter);
+        Assert.Equal(expectedWoodPerDayAfter, actualWoodPerDayAfter);
     }
 }

@@ -19,6 +19,10 @@ public class Building
 
     public bool IsComplete => _isComplete;
 
+    public int DaysToComplete => _daysToComplete;
+
+    public int DaysSpent => _daysSpent;
+
     public enum Type {
         House = 1,
         Woodmill = 2,
@@ -59,7 +63,13 @@ public class Building
     }
     public int GetDaysToComplete()
     {
-        return _daysToComplete;
+        return DaysToComplete;
+    }
+    public static int GetDaysToComplete(Type type)
+    {
+        BuildingTypeProperties.TryGetValue(type, out var typeProperties);
+        var (_, _, daysToComplete, _) = typeProperties;
+        return daysToComplete;
     }
     public int GetCostMetal()
     {
@@ -69,13 +79,13 @@ public class Building
     public static (int costWood, int costMetal) GetCosts(Type type)
     {
         BuildingTypeProperties.TryGetValue(type, out var typeProperties);
-        (var costWood, var costMetal, _, _) = typeProperties;
+        var (costWood, costMetal, _, _) = typeProperties;
         return (costWood, costMetal);
     }
     public void WorkOn()
     {
-        _daysSpent += 1;
+        _daysSpent = DaysSpent + 1;
 
-        if (_daysSpent == _daysToComplete) _isComplete = true;
+        if (DaysSpent == DaysToComplete) _isComplete = true;
     }
 }
