@@ -132,6 +132,7 @@ public class WorkerTest : IClassFixture<VillageFixture>
         village.AddWorker("Olof II the Lumberjack", Worker.Type.Lumberjack, () => village.AddFood());
         village.AddWorker("Olof III the Lumberjack", Worker.Type.Lumberjack, () => village.AddFood());
         village.AddWorker("Olof IV the Lumberjack", Worker.Type.Lumberjack, () => village.AddFood());
+
         var expectedSuccess = false;
         _testOutputHelper.WriteLine($"Expected success: {expectedSuccess}");
         var expectedMaxWorkers = 6;

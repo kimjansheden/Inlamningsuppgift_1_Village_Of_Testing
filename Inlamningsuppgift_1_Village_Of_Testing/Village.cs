@@ -28,6 +28,8 @@ public class Village
     private int _quarries = 0;
     private int _houses = 0;
     private bool _starvation = false;
+    private List<DayEventArgs> _dayEventsList = new List<DayEventArgs>();
+    private List<Worker> _starvingWorkers = new List<Worker>();
 
     private readonly IUI _ui;
 
@@ -39,6 +41,7 @@ public class Village
     public int FoodPerDay => _foodPerDay;
     
     public event EventHandler VillageUpdated;
+    private event EventHandler DayEvents;
 
     public Village(IUI ui)
     {
@@ -51,8 +54,24 @@ public class Village
         {
             BuildingCompleted((new Building(Building.Type.House, this)));
             
-            // The 3 houses come for free, so we must give the wood back that they cost.
+            // The 3 houses come for free, so we must give the wood back that they cost, otherwise the amount of wood will be negative.
             AddWood(5);
+        }
+        
+        // Subscribe to the day's events.
+        DayEvents += OnDayEvent;
+    }
+
+    // Constructor to make testing easier.
+    public Village(IUI ui, int startFood = 10, int startWood = 0, int startMetal = 0, int startMaxWorkers = 0, int startBuilders = 0) : this(ui)
+    {
+        _food = startFood;
+        _wood = startWood;
+        _metal = startMetal;
+        if (startMaxWorkers != 0) _maxWorkers = startMaxWorkers;
+        for (int i = 0; i < startBuilders; i++)
+        {
+            AddWorker("Test", Worker.Type.Builder, () => Build());
         }
     }
     
@@ -61,6 +80,9 @@ public class Village
         // A day goes by.
         _daysGone += 1;
         VillageUpdated?.Invoke(this, EventArgs.Empty);
+        
+        // Clears the old events.
+        _dayEventsList.Clear();
         
         for (var i = 0; i < _workers.Count; i++)
         {
@@ -95,6 +117,9 @@ public class Village
         
         // The building's special action is invoked.
         project.BuildAction.Invoke(this);
+        
+        // An event is fired.
+        DayEvents?.Invoke(this, new DayEventArgs($"The construction of a {project.BuildingType} was completed."));
     }
 
     public void AddHouse()
@@ -292,16 +317,39 @@ public class Village
 
                 // The worker is not hungry after having been fed.
                 worker.Eat();
+                
+                // If the worker has been starving, remove from the list of starving workers.
+                if (!_starvingWorkers.Contains(worker)) continue;
+                _starvingWorkers.Remove(worker);
+
+                // If this was the only worker left starving, there is no longer any starvation in the village.
+                if (_starvingWorkers.Count != 0) continue;
+                _starvation = false;
+                DayEvents?.Invoke(this, new DayEventArgs("There is no longer any starvation in the village."));
             }
             else
             {
                 // The village has no food left, thus the worker gets hungry.
                 worker.Starve();
-                _starvation = true;
+                
+                // If the worker has not been starving before, add to the list of starving workers.
+                if (!_starvingWorkers.Contains(worker))
+                {
+                    _starvingWorkers.Add(worker);    
+                }
+                
+                // If this is the first worker to be starving, change the starvation status of the village to true and fire an event.
+                if (_starvingWorkers.Count == 1)
+                {
+                    _starvation = true;
+                    DayEvents?.Invoke(this, new DayEventArgs("YOUR VILLAGE IS STARVING! You need to either banish a worker from your village, add a farmer or build more farms."));   
+                }
+
                 if (worker.DaysHungry == 40)
                 {
                     worker.Die();
                     BuryDead(worker);
+                    DayEvents?.Invoke(this, new DayEventArgs($"{worker.Name} has starved to death and is now buried in the ground."));
                     
                     // When a worker is removed from the list,
                     // the size of the list decreases by 1.
@@ -358,30 +406,29 @@ public class Village
     {
         return this._buildings;
     }
+    private void OnDayEvent(object? sender, EventArgs e)
+    {
+        // Every time a new event has happened, add it to today's list of events.
+        if (e is DayEventArgs dayEventArgs)
+        {
+            _dayEventsList.Add(dayEventArgs);
+        }
+    }
 
-    /// <summary>
-    /// Get the current state of the village.
-    /// </summary>
-    /// <param name="asString">Set true if you want the state returned as a string.</param>
-    /// <param name="asList">Set true if you want the state returned as a list.</param>
-    /// /// <param name="workers">Set true if you want the detailed state of the workers.</param>
-    /// <returns>The current state of the village as a string or a list.</returns>
-    /// <remarks>The parameters are optional; asString is default.</remarks>
-    // public List<object> GetStats<T>(bool asList = true)
-    // {
-    //     var workersList = new List<object>();
-    //     foreach (var worker in _workers)
-    //     {
-    //         workersList.Add(worker.Name);
-    //         workersList.Add(worker.DaysHungry);
-    //     }
-    // }
+    public string GetEvents()
+    {
+        var statsString = "";
+        if (_dayEventsList.Count == 0) return statsString;
+        foreach (var dayEvent in _dayEventsList)
+        {
+            statsString += dayEvent + "\n";
+        }
+
+        return statsString;
+    }
     public string GetStats()
     {
         var statsString = "";
-        if (_starvation)
-            statsString +=
-                "YOUR VILLAGE IS STARVING! You need to either banish a worker from your village, add a farmer or build more farms.\n";
 
         statsString += $"Day: {_daysGone + 1}.\n\n" +
                        $"Food: {_food}.\n" +
@@ -475,4 +522,14 @@ public class Village
                        $"Castle: {_buildings.Count(b => b.BuildingType == Building.Type.Castle)}\n";
         return statsString;
         }
+
+    public void SaveProgress()
+    {
+        
+    }
+
+    public void LoadProgress()
+    {
+        
+    }
 }

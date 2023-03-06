@@ -11,15 +11,20 @@ public class Game
     public Game(IUI ui)
     {
         // Initialize the UI.
-        // Maybe delete it from village if it's enough to have it on the Game level?
-        // But even if I have it there, I still only have to change it in one place, because I send the right ui on to Village down here.
-        // Yes, the ui is created one time in Program class when the Game object is created. Then that same ui is just passed along to the village and the places that need it.
         _ui = ui;
 
         // Initialize the village.
         _village = new Village(_ui);
         
         // Initialize the strings.
+        _strings = new Strings(_village);
+    }
+
+    // For testing purposes.
+    public Game(IUI ui, int startFood = 10, int startWood = 0, int startMetal = 0, int startMaxWorkers = 0, int startBuilders = 0)
+    {
+        _ui = ui;
+        _village = new Village(_ui, startFood, startWood, startMetal, startMaxWorkers, startBuilders);
         _strings = new Strings(_village);
     }
     public void Run()
@@ -30,8 +35,9 @@ public class Game
 
     public void Menu()
     {
-        while (!_village.GameOver || !_village.GameWon)
+        while (_village is { GameOver: false, GameWon: false })
         {
+            _ui.WriteLine(_village.GetEvents());
             _ui.WriteLine(_strings.Messages[MenuStart]);
             var input = _ui.ReadLine();
             _ui.Clear();
@@ -56,6 +62,8 @@ public class Game
                 case "5":
                     _ui.Clear();
                     _village.Day();
+                    if (_village.GameWon)
+                        break;
                     _ui.WriteLine(_strings.Messages[MenuDay]);
                     break;
                 case "6":

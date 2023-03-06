@@ -1298,21 +1298,14 @@ public class VillageTest : IClassFixture<VillageFixture>
     public void BuildACastleMessageIsDisplayedGameWonIsTrue()
     {
         //Arrange
-        Village village = _villageFixture.Village;
+        // The village starts with the resources expected to build the building being tested.
+        Village village = new Village(new ConsoleUI(), startFood: 50, startWood: 50, startMetal: 50);
         Strings strings = new Strings();
         var writer = new StringWriter();
         Console.SetOut(writer);
-        
+
         village.AddWorker("Leif", Worker.Type.Builder, () => village.Build());
-        
-        // The village starts with the resources expected to build the building being tested.
-        var expectedMetalDeducted = 50;
-        var expectedWoodDeducted = 50;
-        var expectedFoodEaten = 50;
-        
-        village.AddMetal(expectedMetalDeducted);
-        village.AddWood(expectedWoodDeducted);
-        village.AddFood(expectedFoodEaten);
+
         village.AddProject(Building.Type.Castle);
 
         var expectedDaysPassed = 50;
