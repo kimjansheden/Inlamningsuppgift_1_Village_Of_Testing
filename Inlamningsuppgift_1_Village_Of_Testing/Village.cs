@@ -31,6 +31,8 @@ public class Village
     private List<DayEventArgs> _dayEventsList = new List<DayEventArgs>();
     private List<Worker> _starvingWorkers = new List<Worker>();
 
+    private readonly DatabaseConnection _databaseConnection;
+
     private readonly IUI _ui;
 
     private readonly Strings _strings;
@@ -60,10 +62,13 @@ public class Village
         
         // Subscribe to the day's events.
         DayEvents += OnDayEvent;
+        
+        // Initialize the DatabaseConnection.
+        _databaseConnection = new DatabaseConnection();
     }
 
     // Constructor to make testing easier.
-    public Village(IUI ui, int startFood = 10, int startWood = 0, int startMetal = 0, int startMaxWorkers = 0, int startBuilders = 0) : this(ui)
+    public Village(IUI ui, int startFood = 10, int startWood = 0, int startMetal = 0, int startMaxWorkers = 0, int startBuilders = 0, DatabaseConnection databaseConnection = null) : this(ui)
     {
         _food = startFood;
         _wood = startWood;
@@ -73,6 +78,8 @@ public class Village
         {
             AddWorker("Test", Worker.Type.Builder, () => Build());
         }
+
+        _databaseConnection = databaseConnection;
     }
     
     public void Day()
@@ -154,6 +161,7 @@ public class Village
     {
         _ui.WriteLine(_strings.Messages[GameIsWon]);
         _gameWon = true;
+        SaveProgress();
     }
     public void AddFarmer()
     {
@@ -525,11 +533,41 @@ public class Village
 
     public void SaveProgress()
     {
-        
+        _databaseConnection.Save();
     }
 
     public void LoadProgress()
     {
+        // Load the variables from the database into the DatabaseConnection object.
+        _databaseConnection.Load();
         
+        // Recreate the saved state.
+        _daysGone = _databaseConnection.GetDaysGone();
+        _food = _databaseConnection.GetFood();
+        _foodPerDay = _databaseConnection.GetFoodPerDay();
+        _foodPerDayBonus = _databaseConnection.GetFoodPerDayBonus();
+        _metal = _databaseConnection.GetMetal();
+        _metalPerDay = _databaseConnection.GetMetalPerDay();
+        _metalPerDayBonus = _databaseConnection.GetMetalPerDayBonus();
+        _wood = _databaseConnection.GetWood();
+        _woodPerDay = _databaseConnection.GetWoodPerDay();
+        _woodPerDayBonus = _databaseConnection.GetWoodPerDayBonus();
+        _buildings = _databaseConnection.GetBuildings();
+        _projects = _databaseConnection.GetProjects();
+        _workers = _databaseConnection.GetWorkers();
+        _gameOver = _databaseConnection.GetGameOver();
+        _gameWon = _databaseConnection.GetGameWon();
+        _maxWorkers = _databaseConnection.GetMaxWorkers();
+        _farmers = _databaseConnection.GetFarmers();
+        _lumberjacks = _databaseConnection.GetLumberjacks();
+        _quarryworkers = _databaseConnection.GetQuarryWorkers();
+        _builders = _databaseConnection.GetBuilders();
+        _farms = _databaseConnection.GetFarms();
+        _woodmills = _databaseConnection.GetWoodmills();
+        _quarries = _databaseConnection.GetQuarries();
+        _houses = _databaseConnection.GetHouses();
+        _starvation = _databaseConnection.GetStarvation();
+        _dayEventsList = _databaseConnection.GetDayEventsList();
+        _starvingWorkers = _databaseConnection.GetStarvingWorkers();
     }
 }

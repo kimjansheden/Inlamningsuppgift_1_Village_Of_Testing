@@ -16,7 +16,8 @@ public class Strings
         MenuBanishWorkerWorkerStats,
         MenuDay,
         MenuQuit,
-        MenuViewVillage,
+        MenuSaved,
+        MenuLoaded,
         BuildNoProjects,
         BuildNotEnoughResources,
         GameIsWon,
@@ -79,6 +80,8 @@ public class Strings
           $"{menuChoice += 1}. Banish worker\n" +
           $"{menuChoice += 1}. Add project\n" +
           $"{menuChoice += 1}. Next day\n" +
+          $"{menuChoice += 1}. Save progress\n" +
+          $"{menuChoice += 1}. Load progress\n" +
           $"{menuChoice += 1}. Quit";
         
         menuChoice = 0;
@@ -99,6 +102,10 @@ public class Strings
         Messages[Message.MenuBanishWorker] =
             "So you wish to reduce your workforce; eh? Please write the number of the poor soul you would like to banish.\n";
         Messages[Message.BuildNoProjects] = "You must add a project first.";
+        Messages[Message.MenuSaved] =
+            "Your progress has been saved. (Not really though, because this function is not implemented.)";
+        Messages[Message.MenuLoaded] =
+            "Your progress has been loaded. (Not really though, because this function is not implemented.)";
         Messages[Message.BuildNotEnoughResources] = "Not enough resources to build this type of building.";
         Messages[Message.WorkerCantBanishStarving] =
             "You monster! Trying to banish a starving worker! At least have the decency to give them a meal before you kick them out.";

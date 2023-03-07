@@ -1299,7 +1299,7 @@ public class VillageTest : IClassFixture<VillageFixture>
     {
         //Arrange
         // The village starts with the resources expected to build the building being tested.
-        Village village = new Village(new ConsoleUI(), startFood: 50, startWood: 50, startMetal: 50);
+        Village village = new Village(new ConsoleUI(), startFood: 50, startWood: 50, startMetal: 50, databaseConnection: new DatabaseConnection());
         Strings strings = new Strings();
         var writer = new StringWriter();
         Console.SetOut(writer);
