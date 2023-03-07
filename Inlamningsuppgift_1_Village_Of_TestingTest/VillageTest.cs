@@ -80,7 +80,7 @@ public class VillageTest : IClassFixture<VillageFixture>
         var actualDaysGone = village.GetDaysGone();
         var actualBuildings = village.GetBuildings().Count;
         var actualFood = village.GetFood();
-        var actualFoodPerDay = village.FoodPerDay;
+        var actualFoodPerDay = village.GetFoodPerDay();
         var actualMetal = village.GetMetal();
         var actualMetalPerDay = village.GetMetalPerDay();
         var actualProjects = village.GetProjects().Count;

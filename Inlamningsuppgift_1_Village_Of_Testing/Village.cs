@@ -39,11 +39,12 @@ public class Village
 
     public bool GameOver => _gameOver;
     public bool GameWon => _gameWon;
+    public bool Starvation => _starvation;
 
-    public int FoodPerDay => _foodPerDay;
-    
     public event EventHandler VillageUpdated;
     private event EventHandler DayEvents;
+
+    private RandomGenerator _random = new RandomGenerator();
 
     public Village(IUI ui)
     {
@@ -68,7 +69,7 @@ public class Village
     }
 
     // Constructor to make testing easier.
-    public Village(IUI ui, int startFood = 10, int startWood = 0, int startMetal = 0, int startMaxWorkers = 0, int startBuilders = 0, DatabaseConnection databaseConnection = null) : this(ui)
+    public Village(IUI ui, int startFood = 10, int startWood = 0, int startMetal = 0, int startMaxWorkers = 0, int startBuilders = 0, DatabaseConnection databaseConnection = null, RandomGenerator random = default) : this(ui)
     {
         _food = startFood;
         _wood = startWood;
@@ -80,6 +81,7 @@ public class Village
         }
 
         _databaseConnection = databaseConnection;
+        _random = random;
     }
     
     public void Day()
@@ -258,24 +260,45 @@ public class Village
     }
     public bool AddWorker(string name, Worker.Type job, Worker.WorkDelegate workDelegate)
     {
-        if (string.IsNullOrEmpty(name))
-        {
-            _ui.WriteLine(_strings.Messages[WorkerAddNoName]);
-            return false;
-        }
+        if (!HelperValidWorkerName(name)) return false;
         
         // If the number of workers in the village is equal to the maximum workers allowed, then the max is reached and no new workers can live in the village until more houses are built.
-        if (_workers.Count == _maxWorkers)
+        if (HelperMaxWorkersReached()) return false;
+
+        return HelperCreateNewWorker(name, job, workDelegate);
+    }
+    
+    public bool AddRandomWorker(string name)
+    {
+        if (!HelperValidWorkerName(name)) return false;
+        if (HelperMaxWorkersReached()) return false;
+
+        Worker.Type? job = null;
+        Worker.WorkDelegate workDelegate = null;
+        
+        var randomNumber = _random.Next(0, Enum.GetValues(typeof(Worker.Type)).Length);
+
+        switch (randomNumber)
         {
-            _ui.WriteLine(_strings.Messages[WorkerAddNoRoom]);
-            return false;
+            case 1:
+                job = Worker.Type.QuarryWorker;
+                workDelegate = AddMetal;
+                break;
+            case 2:
+                job = Worker.Type.Builder;
+                workDelegate = Build;
+                break;
+            case 3:
+                job = Worker.Type.Lumberjack;
+                workDelegate = AddWood;
+                break;
+            case 4:
+                job = Worker.Type.Farmer;
+                workDelegate = AddFood;
+                break;
         }
 
-        Worker worker = new Worker(name, job, workDelegate);
-        _workers.Add(worker);
-        worker.JobAction.Invoke(this);
-        VillageUpdated?.Invoke(this, EventArgs.Empty);
-        return true;
+        return workDelegate != null && job != null && HelperCreateNewWorker(name, job.Value, workDelegate);
     }
     public void Build()
     {
@@ -375,44 +398,52 @@ public class Village
     }
     public int GetFoodPerDay()
     {
-        return this.FoodPerDay;
+        return _foodPerDay;
+    }
+    public int GetFoodPerDayBonus()
+    {
+        return _foodPerDayBonus;
     }
     public int GetMetal()
     {
-        return this._metal;
+        return _metal;
     }
     public int GetMetalPerDay()
     {
-        return this._metalPerDay;
+        return _metalPerDay;
     }
     public List<Building> GetProjects()
     {
-        return this._projects;
+        return _projects;
     }
     public int GetWood()
     {
-        return this._wood;
+        return _wood;
     }
     public int GetWoodPerDay()
     {
-        return this._woodPerDay;
+        return _woodPerDay;
     }
     public List<Worker> GetWorkers()
     {
-        return this._workers;
+        return _workers;
     }
     public int GetMaxWorkers()
     {
-        return this._maxWorkers;
+        return _maxWorkers;
     }
 
     public int GetFood()
     {
-        return this._food;
+        return _food;
+    }
+    public int GetFarmers()
+    {
+        return _farmers;
     }
     public List<Building> GetBuildings()
     {
-        return this._buildings;
+        return _buildings;
     }
     private void OnDayEvent(object? sender, EventArgs e)
     {
@@ -569,5 +600,90 @@ public class Village
         _starvation = _databaseConnection.GetStarvation();
         _dayEventsList = _databaseConnection.GetDayEventsList();
         _starvingWorkers = _databaseConnection.GetStarvingWorkers();
+    }
+
+    public int GetMetalPerDayBonus()
+    {
+        return _metalPerDayBonus;
+    }
+
+    public int GetWoodPerDayBonus()
+    {
+        return _woodPerDayBonus;
+    }
+
+    public int GetLumberjacks()
+    {
+        return _lumberjacks;
+    }
+
+    public int GetQuarryWorkers()
+    {
+        return _quarryworkers;
+    }
+
+    public int GetBuilders()
+    {
+        return _builders;
+    }
+
+    public int GetFarms()
+    {
+        return _farms;
+    }
+
+    public int GetWoodmills()
+    {
+        return _woodmills;
+    }
+
+    public int GetQuarries()
+    {
+        return _quarries;
+    }
+
+    public int GetHouses()
+    {
+        return _houses;
+    }
+
+    public IEnumerable<DayEventArgs> GetDayEventsList()
+    {
+        return _dayEventsList;
+    }
+
+    public IEnumerable<Worker> GetStarvingWorkers()
+    {
+        return _starvingWorkers;
+    }
+    
+    // Helper methods
+    private bool HelperCreateNewWorker(string name, Worker.Type job, Worker.WorkDelegate workDelegate)
+    {
+        Worker worker = new Worker(name, job, workDelegate);
+        _workers.Add(worker);
+        worker.JobAction.Invoke(this);
+        VillageUpdated?.Invoke(this, EventArgs.Empty);
+        return true;
+    }
+
+    private bool HelperMaxWorkersReached()
+    {
+        if (_workers.Count == _maxWorkers)
+        {
+            _ui.WriteLine(_strings.Messages[WorkerAddNoRoom]);
+            return true;
+        }
+        return false;
+    }
+
+    private bool HelperValidWorkerName(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            _ui.WriteLine(_strings.Messages[WorkerAddNoName]);
+            return false;
+        }
+        return true;
     }
 }

@@ -9,7 +9,7 @@ public class Worker
     private readonly string _name;
     public delegate void WorkDelegate();
     private WorkDelegate _workDelegate;
-    
+
     private Action<Village> _jobAction;
     public Action<Village> JobAction => _jobAction;
     
@@ -41,9 +41,9 @@ public class Worker
 
     public Worker(string name, Type job, WorkDelegate workDelegate)
     {
-        this._name = name;
-        this._job = job;
-        this._workDelegate = workDelegate;
+        _name = name;
+        _job = job;
+        _workDelegate = workDelegate;
         _jobProperties.TryGetValue(job, out var jobProperties);
         _jobAction = jobProperties!(this);
     }

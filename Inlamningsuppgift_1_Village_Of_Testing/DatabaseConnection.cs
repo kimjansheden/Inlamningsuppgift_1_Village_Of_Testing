@@ -30,17 +30,6 @@ public class DatabaseConnection
     private List<DayEventArgs> _dayEventsList = new List<DayEventArgs>();
     private List<Worker> _starvingWorkers = new List<Worker>();
 
-    public int DaysGone
-    {
-        set => _daysGone = value;
-    }
-
-    public int Wood
-    {
-        get => _wood;
-        set => _wood = value;
-    }
-
     public virtual void Save()
     {
         // Saves all variables to the database.
@@ -54,6 +43,7 @@ public class DatabaseConnection
         
         // _daysGone = daysGone;
         // Etc. …
+        throw new NotImplementedException();
     }
 
     public virtual int GetWood()

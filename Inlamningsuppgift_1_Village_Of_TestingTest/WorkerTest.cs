@@ -1,4 +1,5 @@
 using Inlamningsuppgift_1_Village_Of_Testing;
+using Moq;
 using Xunit.Abstractions;
 using static Inlamningsuppgift_1_Village_Of_Testing.Strings.Message;
 
@@ -42,6 +43,158 @@ public class WorkerTest : IClassFixture<VillageFixture>
         
         //Assert
         Assert.Equal(expectedName, actualName);
+    }
+
+    [Fact]
+    public void AddRandomWorker_Mock_Random_1_Should_Add_QuarryWorker_And_Do_The_Right_Job()
+    {
+        //Arrange
+        Mock<RandomGenerator> randMock = new Mock<RandomGenerator>();
+        Village village = new Village(new ConsoleUI(), random: randMock.Object);
+
+        randMock.Setup(rand => rand.Next(0, Enum.GetValues(typeof(Worker.Type)).Length)).Returns(1);
+        
+        var expectedNumber = 1;
+        var expectedJobType = Worker.Type.QuarryWorker;
+        var expectedMetalBeforeDay = 0;
+        var expectedMetalPerDayBeforeNewWorker = 0;
+        var expectedMetalAfterDay = 1;
+        var expectedMetalPerDayAfterNewWorker = 1;
+        
+        // Act
+        var actualMetalPerDayBeforeNewWorker = village.GetMetalPerDay();
+        
+        village.AddRandomWorker("Sven");
+        
+        var actualMetalBeforeDay = village.GetMetal();
+
+        village.Day();
+        
+        var actualNumber = randMock.Invocations.Last().ReturnValue;
+        var actualJobType = village.GetWorkers()[0].Job;
+        var actualMetalAfterDay = village.GetMetal();
+        var actualMetalPerDayAfterNewWorker = village.GetMetalPerDay();
+
+        // Assert
+        randMock.Verify(rand => rand.Next(0, Enum.GetValues(typeof(Worker.Type)).Length), Times.Once);
+        Assert.Equal(expectedNumber, actualNumber);
+        Assert.Equal(expectedJobType, actualJobType);
+        Assert.Equal(expectedMetalBeforeDay, actualMetalBeforeDay);
+        Assert.Equal(expectedMetalAfterDay, actualMetalAfterDay);
+        Assert.Equal(expectedMetalPerDayBeforeNewWorker, actualMetalPerDayBeforeNewWorker);
+        Assert.Equal(expectedMetalPerDayAfterNewWorker, actualMetalPerDayAfterNewWorker);
+    }
+    [Fact]
+    public void AddRandomWorker_Mock_Random_2_Should_Add_Builder_And_Do_The_Right_Job()
+    {
+        //Arrange
+        Mock<RandomGenerator> randMock = new Mock<RandomGenerator>();
+        Village village = new Village(new ConsoleUI(), random: randMock.Object, startFood:100, startMetal:100, startWood:100);
+
+        randMock.Setup(rand => rand.Next(0, Enum.GetValues(typeof(Worker.Type)).Length)).Returns(2);
+        
+        var expectedNumber = 2;
+        var expectedJobType = Worker.Type.Builder;
+        var expectedDaysWorkedOnProjectBeforeDay = 0;
+        var expectedDaysWorkedOnProjectAfterDay = 1;
+
+        // Act
+        village.AddProject(Building.Type.House);
+        
+        var actualDaysWorkedOnProjectBeforeDay = village.GetProjects()[0].DaysSpent;
+        
+        village.AddRandomWorker("Sven");
+
+        village.Day();
+        
+        var actualNumber = randMock.Invocations.Last().ReturnValue;
+        var actualJobType = village.GetWorkers()[0].Job;
+        var actualDaysWorkedOnProjectAfterDay = village.GetProjects()[0].DaysSpent;
+
+        // Assert
+        randMock.Verify(rand => rand.Next(0, Enum.GetValues(typeof(Worker.Type)).Length), Times.Once);
+        Assert.Equal(expectedNumber, actualNumber);
+        Assert.Equal(expectedJobType, actualJobType);
+        Assert.Equal(expectedDaysWorkedOnProjectBeforeDay, actualDaysWorkedOnProjectBeforeDay);
+        Assert.Equal(expectedDaysWorkedOnProjectAfterDay, actualDaysWorkedOnProjectAfterDay);
+    }
+    [Fact]
+    public void AddRandomWorker_Mock_Random_3_Should_Add_Lumberjack_And_Do_The_Right_Job()
+    {
+        //Arrange
+        Mock<RandomGenerator> randMock = new Mock<RandomGenerator>();
+        Village village = new Village(new ConsoleUI(), random: randMock.Object);
+
+        randMock.Setup(rand => rand.Next(0, Enum.GetValues(typeof(Worker.Type)).Length)).Returns(3);
+        
+        var expectedNumber = 3;
+        var expectedJobType = Worker.Type.Lumberjack;
+        var expectedWoodBeforeDay = 0;
+        var expectedWoodPerDayBeforeNewWorker = 0;
+        var expectedWoodAfterDay = 1;
+        var expectedWoodPerDayAfterNewWorker = 1;
+        
+        // Act
+        var actualWoodPerDayBeforeNewWorker = village.GetWoodPerDay();
+        
+        village.AddRandomWorker("Sven");
+        
+        var actualWoodBeforeDay = village.GetWood();
+
+        village.Day();
+        
+        var actualNumber = randMock.Invocations.Last().ReturnValue;
+        var actualJobType = village.GetWorkers()[0].Job;
+        var actualWoodAfterDay = village.GetWood();
+        var actualWoodPerDayAfterNewWorker = village.GetWoodPerDay();
+
+        // Assert
+        randMock.Verify(rand => rand.Next(0, Enum.GetValues(typeof(Worker.Type)).Length), Times.Once);
+        Assert.Equal(expectedNumber, actualNumber);
+        Assert.Equal(expectedJobType, actualJobType);
+        Assert.Equal(expectedWoodBeforeDay, actualWoodBeforeDay);
+        Assert.Equal(expectedWoodAfterDay, actualWoodAfterDay);
+        Assert.Equal(expectedWoodPerDayBeforeNewWorker, actualWoodPerDayBeforeNewWorker);
+        Assert.Equal(expectedWoodPerDayAfterNewWorker, actualWoodPerDayAfterNewWorker);
+    }
+    [Fact]
+    public void AddRandomWorker_Mock_Random_4_Should_Add_Farmer_And_Do_The_Right_Job()
+    {
+        //Arrange
+        Mock<RandomGenerator> randMock = new Mock<RandomGenerator>();
+        Village village = new Village(new ConsoleUI(), random: randMock.Object);
+
+        randMock.Setup(rand => rand.Next(0, Enum.GetValues(typeof(Worker.Type)).Length)).Returns(4);
+        
+        var expectedNumber = 4;
+        var expectedJobType = Worker.Type.Farmer;
+        var expectedFoodBeforeDay = 10;
+        var expectedFoodPerDayBeforeNewWorker = 0;
+        var expectedFoodAfterDay = 14; // Because he eats one.
+        var expectedFoodPerDayAfterNewWorker = 5;
+        
+        // Act
+        var actualFoodPerDayBeforeNewWorker = village.GetFoodPerDay();
+        
+        village.AddRandomWorker("Sven");
+        
+        var actualFoodBeforeDay = village.GetFood();
+
+        village.Day();
+        
+        var actualNumber = randMock.Invocations.Last().ReturnValue;
+        var actualJobType = village.GetWorkers()[0].Job;
+        var actualFoodAfterDay = village.GetFood();
+        var actualFoodPerDayAfterNewWorker = village.GetFoodPerDay();
+
+        // Assert
+        randMock.Verify(rand => rand.Next(0, Enum.GetValues(typeof(Worker.Type)).Length), Times.Once);
+        Assert.Equal(expectedNumber, actualNumber);
+        Assert.Equal(expectedJobType, actualJobType);
+        Assert.Equal(expectedFoodBeforeDay, actualFoodBeforeDay);
+        Assert.Equal(expectedFoodAfterDay, actualFoodAfterDay);
+        Assert.Equal(expectedFoodPerDayBeforeNewWorker, actualFoodPerDayBeforeNewWorker);
+        Assert.Equal(expectedFoodPerDayAfterNewWorker, actualFoodPerDayAfterNewWorker);
     }
     [Fact]
     public void Add1WorkerVillageShouldHave1Worker()
