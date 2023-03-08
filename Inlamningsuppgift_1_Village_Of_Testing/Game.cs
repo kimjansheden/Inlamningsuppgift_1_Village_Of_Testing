@@ -67,11 +67,9 @@ public class Game
                     _ui.WriteLine(_strings.Messages[MenuDay]);
                     break;
                 case "6":
-                    _village.SaveProgress();
                     _ui.WriteLine(_strings.Messages[MenuSaved]);
                     break;
                 case "7":
-                    _village.LoadProgress();
                     _ui.WriteLine(_strings.Messages[MenuLoaded]);
                     break;
                 case "8":

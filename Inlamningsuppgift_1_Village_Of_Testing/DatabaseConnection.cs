@@ -43,7 +43,6 @@ public class DatabaseConnection
         
         // _daysGone = daysGone;
         // Etc. …
-        throw new NotImplementedException();
     }
 
     public virtual int GetWood()
