@@ -227,7 +227,7 @@ public class VillageTest : IClassFixture<VillageFixture>
         
         foreach (var worker in village.GetWorkers())
         {
-            if (worker.Alive == true)
+            if (worker.Alive)
             {
                 actualAliveWorkers.Add(worker);
             }
@@ -235,7 +235,7 @@ public class VillageTest : IClassFixture<VillageFixture>
 
         foreach (var worker in village.GetWorkers())
         {
-            if (worker.Hungry == true)
+            if (worker.Hungry)
             {
                 actualHungryWorkers.Add(worker);
             }

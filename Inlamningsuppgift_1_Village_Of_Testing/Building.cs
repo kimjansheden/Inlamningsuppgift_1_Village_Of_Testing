@@ -31,11 +31,6 @@ public class Building
         Castle = 5
     }
 
-    // Denna delegate behövs inte skrivas ut; den är samma som
-    // Func<Building, (int, int, int)>. Func of Building tar en Building som parameter och
-    // returnerar en tupel med tre ints.
-    // private delegate (int, int, int) ResourcesCost(Building building);
-    
     private static readonly Dictionary<Type, (int costWood, int costMetal, int daysToComplete, Action<Village> action)> BuildingTypeProperties =
         new Dictionary<Type, (int costWood, int costMetal, int daysToComplete, Action<Village> action)>()
         {

@@ -112,5 +112,6 @@ public class Strings
         Messages[Message.WorkerHasBeenBanished] =
             " gathers the few things they have in a little bundle and looks at you with sadness in their eyes. It's almost as if the eyes speak to you, and you can see the unspoken question in them: \"What did I do wrong?\"\n";
         Messages[Message.MenuQuit] = "Thank you for playing, see you next time!";
+        Messages[Message.GameIsOver] = "Game Over!";
     }
 }

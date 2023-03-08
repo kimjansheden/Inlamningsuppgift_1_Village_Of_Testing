@@ -115,8 +115,6 @@ public class Village
         _foodPerDay = (_farmers * 5) + (_foodPerDayBonus * _farmers);
         _woodPerDay = _lumberjacks + (_woodPerDayBonus * _lumberjacks);
         _metalPerDay = _quarryworkers + (_metalPerDayBonus * _quarryworkers);
-        
-        // Update the current buildings.
     }
 
     public void BuildingCompleted(Building project)
@@ -303,11 +301,8 @@ public class Village
     public void Build()
     {
         if (_projects.Count == 0)
-        {
-            //_ui.WriteLine(_strings.Messages[BuildNoProjects]);
             return;
-        }
-        
+
         // Work on the project at the top of the list.
         var project = _projects[0];
         project.WorkOn();
@@ -332,7 +327,7 @@ public class Village
         // If all workers of the village are dead and buried, the game is over.
         if (_workers.Count != 0) return;
         _gameOver = true;
-        _ui.WriteLine("Game Over!");
+        _ui.WriteLine(_strings.Messages[GameIsOver]);
     }
 
     public void FeedWorkers(int amount)
