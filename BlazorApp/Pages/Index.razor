@@ -1,0 +1,93 @@
+﻿@page "/"
+@using GameLib
+@using WebUI = GameLib.WebUI
+@inject IJSRuntime JsRuntime
+
+<PageTitle>Village of Testing</PageTitle>
+
+<h1>Village of Testing</h1>
+
+<div id="index"></div>
+
+<img src="/Images/age-of-empires2.gif" alt="The Village Awaits You …" style="@(!_showGif ? "display:none;" : "")" />
+<br /><br />
+<button class="btn btn-primary" @onclick="StartGame" style="@(!_showStart ? "display:none;" : "")">Start game</button>
+
+<audio id="theme" src="/Audio/aoe_theme.mp3" autoplay></audio>
+
+<div class="container">
+    <p role="status">@((MarkupString)CurrentLine)</p>
+</div>
+
+<p>
+    <label for="userInput" style="@(!_showInput ? "display:none;" : "")">Enter your choice:</label>
+    <input 
+        type="text" 
+        id="userInput" 
+        value="@_userInput"
+        @oninput="@((e) => _userInput = e.Value.ToString())"
+        @onkeydown="@(async (e) => { if (e.Key == "Enter") { ProcessInput(); } })"
+        style="@(!_showInput ? "display:none;" : "")" />
+</p>
+
+<button class="btn btn-primary" @onclick="ProcessInput" style="@(!_showInput ? "display:none;" : "")">Send</button>
+
+
+@code {
+    private bool _showGif = true;
+    private bool _showStart = true;
+    private bool _showInput = false;
+    private string _currentLine = "";
+    private WebUIHelper _helper = new WebUIHelper();
+    private IUI _ui;
+    private string _userInput;
+
+    public event EventHandler InputUpdated;
+
+    public Index()
+    {
+        _ui = new WebUI(_helper);
+        _helper.MessageUpdated += GetWriteLine;
+    }
+    
+    public string CurrentLine => _currentLine;
+    
+    private void StartGame()
+    {
+        _showGif = false;
+        _showStart = false;
+        _showInput = true;
+        
+        Game game = new Game(_ui, jsRuntime: JsRuntime);
+        Thread gameThread = new Thread(game.Run);
+        gameThread.Start();
+        PlayAudio("/Audio/aoe_theme.mp3");
+        game.Village.EndGame += EndGame;
+    }
+    
+    private async Task PlayAudio(string source)
+    {
+        await JsRuntime.InvokeVoidAsync("playAudio", source);
+    }
+
+    private void EndGame(object? sender, EventArgs e)
+    {
+        _showInput = false;
+        InvokeAsync(() => StateHasChanged());
+    }
+
+    private void GetWriteLine(object? sender, EventArgs e)
+    {
+        _currentLine = _helper.Message;
+        
+        // Trigger a re-render of the component.
+        InvokeAsync(() => StateHasChanged());
+    }
+
+    private void ProcessInput()
+    {
+        _helper.UserInput = _userInput;
+        InputUpdated?.Invoke(this, EventArgs.Empty);
+        InvokeAsync(() => StateHasChanged());
+    }
+}
