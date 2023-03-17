@@ -8,7 +8,8 @@ Målet är för samhället att bli tillräckligt stort för att bygga ett slott.
 
 ### Klasser
 Det ska finnas en klass Village, en klass Building och en klass Worker. Huvudklassen ska vara Village. Det är denna klassens funktioner som vi vill testa.
-Village
+
+#### Village
 Den ska innehålla:
 - En variabel för hur mycket mat som byn har
 - En variabel för hur mycket trä som byn har
@@ -22,7 +23,7 @@ Låt variablerna vara private, men för testningens skull, gör så att det finn
 
 Gör så att konstruktorn till Village skapar tre hus och ger byn 10 mat. De kommer behöva det. Resten av värdena kan vara tomma listor och värdet 0.
 
-### Worker
+#### Worker
 Skapa en klass Worker. Varje Worker ska ha namn, en string som beskriver vad de arbetar med och en delegate/functional interface som innehåller vad som händer när de arbetar.
 
 Worker-klassen har en funktion DoWork(). Denna kallar på en delegate/functional interface som finns skapad som ett objekt i Worker. Denna ska kalla på en av fyra funktioner i Village. Village har en funktion per möjlig sak en Worker kan göra. AddWood, lägger till 1 ved till byns resurser. AddMetal, vilken gör detsamma för metall. AddFood, som ger typ 5 mat till byn. Mer än 1, i alla fall. Sedan Build, vi kommer till vad den gör. Skicka in via en lambda expression vilken som skall göras när en arbetare skapas.
@@ -33,12 +34,12 @@ Lägg till en räknare "daysHungry" och en boolean "alive" till Worker. Om de bl
 
 Ha en separat funktion "BuryDead()" som tar bort alla Workers som har "alive = false" ur listan Workers. Om listan av Workers nu blir tom, skriv ut "Game Over".
 
-### Building
+#### Building
 Vi kommer vilja bygga byggnader till vår by. Skapa en klass "Building". Den ska ha en string "namn", sedan en boolean är ifall byggnaden är färdig eller inte. Den ska ha två nummer; en är hur många arbetsdagar det tar att göra klart byggnaden, och den andra hur många arbetsdagar som har spenderats på byggnaden. Detta, plus att varje byggnad ska ha hur mycket det kostar i ved och metall att påbörja bygget.
 
 När en arbetare kör Build-funktionen, så ska den gå in i listan av projekt, ta den första, och lägga till 1 till antalet arbetsdagar spenderade på byggnaden. Om antalet spenderade arbetsdagar överstiger antalet arbetsdagar det tar att bygga byggnaden så är byggnaden klar. Flytta den från listan av pågående projekt till listan av klara byggnader. Beroende på byggnaden borde den klara byggnaden ha en påverkan på byn, som borde kunna göras med variabler.
 
-#### Byggnader:
+##### Byggnader:
 - House – Kostar 5 ved att påbörja, tar 3 dagar att bygga – Det tillåts existera två arbetare per House som finns. Se till att Village har en AddWorker() funktion, och den kollar först ifall det finns tillräckligt många hus innan den lägger till en ny arbetare.
 - Woodmill – Kostar 5 ved och 1 metall att påbörja, tar 5 dagar att bygga – Gör så att en arbetare som samlar ved plockar upp 2 mer ved per dag. Du kan vilja ändra på en variabel som används i AddWood() när Woodmill är klar.
 - Quarry – Kostar 3 ved och 5 metall att påbörja, tar 7 dagar att bygga – Gör så att en arbetare som samlar metall plockar upp 2 mer metall per dag. Du kan vilja ändra på en variabel som används i AddMetal() när Quarry är klar.
