@@ -1,6 +1,13 @@
 # Village Of Testing
 My second solo home assignment in C# in the second semester of my education. The task was to create a simple game while at the same time learn to use unit testing.
 
+## Notes
+The task was not to create a website, I just thought that doing another console app would be boring, so I made both a console app and a very simple web UI based on the IO of the console app. Therefore the website is exactly like the console UI, i.e. no hyperlinks or anything, just input a choice and read the outcome.
+
+The output is formatted a bit different than the console version obviously. I wanted to learn how to do basic stuff like CSS text size, columns, also some sound and image handling.
+
+First I made the console app according to the assignment criteria, then I wanted to see if I could use the game mechanic I hade already done in a website.
+
 ## ASSIGNMENT (In Swedish)
 Er uppgift är att skapa en rad funktioner och klasser som simulerar en växande by. Varje arbetare är registrerad som ett objekt, och de har en begränsad andel resurser att göra byggnader med. Ni ska skapa funktioner och sedan testa dem för att se att de gör vad de ska göra. Applikationen ska utvecklas med C# eller Java, och sedan testas med valfritt enhetstestningsverktyg.
 
@@ -86,10 +93,3 @@ Testa LoadProgress(). Använd mockning för att ge direkt vad som ska ge tillbak
 Förutom detta, skapa en funktion AddRandomWorker(). Denna använder en slumpgenerator för att skapa en ny arbetare som själv får bestämma vilket arbete denna ska arbeta med. Alltså en annan delegate/functional interface beroende på resultatet av en slumpgenerator.
 
 Testa AddRandomWorker(), men använd mockning för att göra så att, i vårt test, så kommer resultatet från slumpgeneratorn alltid bli samma. Kör sedan Day() för att vår RandomWorker ska göra sitt jobb och testa sedan att det blev rätt.
-
-## Notes
-The task was not to create a website, I just thought that doing another console app would be boring, so I made both a console app and a very simple web UI based on the IO of the console app. Therefore the website is exactly like the console UI, i.e. no hyperlinks or anything, just input a choice and read the outcome.
-
-The output is formatted a bit different than the console version obviously. I wanted to learn how to do basic stuff like CSS text size, columns, also some sound and image handling.
-
-First I made the console app according to the assignment criteria, then I wanted to see if I could use the game mechanic I hade already done in a website.
